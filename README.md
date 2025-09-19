@@ -1,11 +1,15 @@
-# 🎂 Happy Birthday, My Best Friend 🎉  
+# 🎉 Happy Birthday, Abdullah Naveed! 🎂  
 
-Hey **[Abdullah Naveed]**!  
+Hey **Abdullah Naveed** 👋  
 
-Today is special because it’s **your day** 🎈  
-So here’s a little surprise from me on GitHub.  
+I’ve made a little surprise for your birthday right here on GitHub 💻💝  
 
 ---
 
-## 🎊 🎶 Wishing you joy & success 🎶 🎊  
+## 🕹️ Play Your Birthday Game 🎂  
+👉 [Click here to play *Catch the Cake!*](https://avyvn298-dot.github.io/Birthday-wishes/)  
+
+---
+
+## 🎊 Here’s a Cake Just for You 🎊  
 
