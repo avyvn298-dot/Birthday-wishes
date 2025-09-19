@@ -3,55 +3,38 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Abdullah's 17th Birthday Quest</title>
+<title>Abdullah's 17th Birthday Quest — Pixel Edition</title>
 <style>
   :root{
-    --bg1:#0f1724;
-    --bg2:#10304a;
-    --ui:#d1f2ff;
-    --accent:#ff6f61;
+    --bg1:#071223; --bg2:#0d2a3a; --ui:#dff6ff; --accent:#ff6f61;
     --pixel-font: "Courier New", monospace;
   }
   html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--ui);font-family:var(--pixel-font);}
-  .wrap{max-width:900px;margin:12px auto;padding:12px;text-align:center;}
+  .wrap{max-width:920px;margin:12px auto;padding:12px;text-align:center;}
   .title{font-size:20px;margin-bottom:6px;letter-spacing:1px}
   .dialogue-box{
-    width: min(760px, 96%);
-    margin: 6px auto;
-    background: rgba(10,10,10,0.85);
-    border:4px solid #111;
-    padding:16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-    font-size:18px;
-    line-height:1.4;
-    border-radius:8px;
-    text-align:left;
+    width: min(820px, 96%); margin: 6px auto; background: rgba(8,8,8,0.85); border:4px solid #071826;
+    padding:16px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); font-size:18px; line-height:1.4; border-radius:8px; text-align:left;
   }
   .dialogue-text{min-height:56px;white-space:pre-wrap;font-family:var(--pixel-font);font-size:18px;color:var(--ui)}
   .choices{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
-  .btn{
-    background:var(--accent); color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:700;
-    box-shadow: 0 3px 0 rgba(0,0,0,0.3);
-  }
+  .btn{ background:var(--accent); color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:700;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.3); }
   .btn:active{transform:translateY(1px)}
-  canvas{display:block;margin:12px auto;border:4px solid #0c2b3a;background:#08121a;border-radius:8px}
-  .hud{display:flex;justify-content:space-between;align-items:center;max-width:760px;margin:0 auto;color:var(--ui);font-weight:700}
-  .message-float{
-    position:fixed;left:50%;transform:translateX(-50%);top:18%;
+  canvas{display:block;margin:12px auto;border:4px solid #072733;background:#06121a;border-radius:8px}
+  .hud{display:flex;justify-content:space-between;align-items:center;max-width:820px;margin:6px auto;color:var(--ui);font-weight:700}
+  .message-float{ position:fixed;left:50%;transform:translateX(-50%);top:18%;
     background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:8px;border:2px solid rgba(255,255,255,0.06);
-    font-family:var(--pixel-font);font-size:16px;pointer-events:none;opacity:0;transition:opacity .2s;
-  }
+    font-family:var(--pixel-font);font-size:16px;pointer-events:none;opacity:0;transition:opacity .2s;}
   .hidden{display:none}
-  /* Responsive */
-  @media (max-width:460px){
-    .dialogue-text{font-size:16px}
-    .title{font-size:18px}
-  }
+  .controls{display:flex;gap:8px;align-items:center}
+  .mutebtn{background:transparent;border:1px solid rgba(255,255,255,0.08);color:var(--ui);padding:6px 8px;border-radius:6px;cursor:pointer}
+  @media (max-width:460px){ .dialogue-text{font-size:16px} .title{font-size:18px} }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="title">🎮 Abdullah's 17th Birthday Quest — (Pixel Edition)</div>
+    <div class="title">🎮 Abdullah's 17th Birthday Quest — Pixel Edition</div>
 
     <div id="dialogue" class="dialogue-box" aria-live="polite">
       <div id="dialogueText" class="dialogue-text"></div>
@@ -62,14 +45,18 @@
     <div class="hud hidden" id="hud">
       <div id="status">Name: <strong id="playerName">Abdullah Naveed</strong></div>
       <div id="score">Score: 0 / 17</div>
+      <div class="controls">
+        <button id="muteBtn" class="mutebtn">🔊 Music: On</button>
+      </div>
     </div>
 
-    <canvas id="game" width="360" height="540" class="hidden" aria-label="Birthday game canvas"></canvas>
+    <canvas id="game" width="420" height="600" class="hidden" aria-label="Birthday game canvas"></canvas>
 
     <div id="finalBox" class="dialogue-box hidden" style="text-align:center">
       <div id="finalText" style="font-size:20px;font-weight:900"></div>
-      <div style="margin-top:12px">
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
         <button id="replayBtn" class="btn">Play Again</button>
+        <button id="downloadCert" class="btn">Download Certificate</button>
       </div>
     </div>
   </div>
@@ -78,21 +65,15 @@
 
 <script>
 /* ===========================
-   CONFIG - tweak here
+   CONFIG
    =========================== */
 const NAME = "Abdullah Naveed";
-const TARGET_SCORE = 17; // 17th birthday
-const PLAYER_COLORS = {
-  skin: "#f2d1b3",
-  hair: "#2c1b10",
-  shirt: "#2a9df4",
-  pants: "#222"
-};
-const CANVAS_BASE_W = 360; // for scaling sprites
+const TARGET_SCORE = 17;
+const PLAYER_COLORS = { skin: "#f0d6b6", hair: "#2b1a0e", shirt: "#2a9df4", pants: "#222", shoe:"#111" };
+const CANVAS_BASE_W = 420;
 /* =========================== */
 
-/* Dialogue data: each item is either text or a choice block.
-   For choice blocks, provide choices array with {label, reply}. */
+/* Dialogue script */
 const script = [
   { type: "text", text: `Hi ${NAME}.` },
   { type: "text", text: `I know it's your birthday today 🎂` },
@@ -110,9 +91,7 @@ const script = [
   { type: "action", label: "Start Quest" }
 ];
 
-/* ==========================
-   Dialogue system
-   ========================== */
+/* Dialogue system */
 const dialogueEl = document.getElementById("dialogue");
 const textEl = document.getElementById("dialogueText");
 const choicesEl = document.getElementById("dialogueChoices");
@@ -122,10 +101,7 @@ const scoreEl = document.getElementById("score");
 const playerNameEl = document.getElementById("playerName");
 playerNameEl.textContent = NAME;
 
-let scriptIndex = 0;
-let typingTimer = null;
-let charI = 0;
-let isTyping = false;
+let scriptIndex = 0, typingTimer = null, charI = 0, isTyping = false;
 
 function showNextScript() {
   choicesEl.innerHTML = "";
@@ -140,14 +116,12 @@ function showNextScript() {
     });
   } else if (node.type === "choice") {
     typeText(node.text, () => {
-      // render choice buttons
       node.choices.forEach(c=>{
         const b = document.createElement("button");
         b.className = "btn";
         b.textContent = c.label;
         b.onclick = () => {
           showFloatMessage(c.reply);
-          // show reply briefly then continue
           typeText(c.reply, ()=> {
             setTimeout(()=>{ showNextScript(); }, 600);
           }, true);
@@ -156,7 +130,6 @@ function showNextScript() {
       });
     });
   } else if (node.type === "action") {
-    // final action button (Start Quest)
     const b = document.createElement("button");
     b.className = "btn";
     b.textContent = node.label;
@@ -170,7 +143,7 @@ function typeText(txt, done, override=false) {
   isTyping = true;
   textEl.textContent = "";
   charI = 0;
-  const speed = 18; // ms per char
+  const speed = 16;
   clearInterval(typingTimer);
   typingTimer = setInterval(()=>{
     textEl.textContent += txt[charI++] || "";
@@ -190,32 +163,27 @@ function showFloatMessage(msg, t=1400) {
   el._t = setTimeout(()=>{ el.style.opacity = 0; }, t);
 }
 
-/* Start by showing script */
 showNextScript();
 
 /* ==========================
-   GAME: canvas, sprites, logic
+   CANVAS + PIXEL SPRITES
    ========================== */
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d", { alpha: false });
-let scale = 2; // pixel scale for sprites, adjusted later
+let scale = 3; // pixel scale
+
 function fitCanvas() {
-  const available = Math.min(window.innerWidth * 0.96, 760);
-  canvas.width = Math.floor(Math.min(available, 420));
-  canvas.height = Math.floor(canvas.width * 1.4);
-  scale = Math.max(2, Math.floor(canvas.width / CANVAS_BASE_W * 2));
+  const maxW = Math.min(window.innerWidth * 0.94, 820);
+  canvas.width = Math.floor(Math.min(maxW, 560));
+  canvas.height = Math.floor(canvas.width * 1.35);
+  // scale relative to base sprite sizes
+  scale = Math.max(2, Math.floor(canvas.width / CANVAS_BASE_W * 3));
 }
-window.addEventListener("resize", () => {
-  fitCanvas();
-  drawStatic(); // redraw background if needed
-});
+window.addEventListener("resize", () => { fitCanvas(); drawStatic(); });
 fitCanvas();
 
-/* Pixel sprite drawing helper:
-   sprite: 2D array of palette indices (0 = transparent)
-   palette: array of color hex strings (index correspond)
-   draw at x,y (top-left) scaled by 'scale' */
-function drawPixelSprite(sprite, palette, x, y) {
+/* sprite draw helper */
+function drawPixel(sprite, palette, x, y) {
   for (let yy=0; yy<sprite.length; yy++){
     for (let xx=0; xx<sprite[0].length; xx++){
       const v = sprite[yy][xx];
@@ -226,189 +194,161 @@ function drawPixelSprite(sprite, palette, x, y) {
   }
 }
 
-/* --- Tiny Abdullah sprite (12x12) palette indices:
-   0 = transparent
-   1 = skin
-   2 = hair
-   3 = shirt
-   4 = pants
-   5 = shoe
-*/
+/* ---- Sprites (bigger, clearer) ----
+   hero 16x16 (pixel portrait + body)
+   gift 8x8, cake 8x7, book 8x6 (distinct shapes) */
 const heroSprite = [
-  [0,0,0,1,1,1,1,1,1,0,0,0],
-  [0,0,1,1,1,1,1,1,1,1,0,0],
-  [0,0,0,2,2,2,2,2,2,0,0,0],
-  [0,0,2,2,2,2,2,2,2,2,0,0],
-  [0,0,0,1,1,1,1,1,1,0,0,0],
-  [0,0,3,3,3,3,3,3,3,3,3,0],
-  [0,0,3,3,3,3,3,3,3,3,3,0],
-  [0,0,4,4,4,4,4,4,4,4,4,0],
-  [0,0,4,4,4,4,4,4,4,4,4,0],
-  [0,0,0,5,5,0,0,5,5,0,0,0],
-  [0,0,0,5,5,0,0,5,5,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0]
+  /* head and hair */
+  [0,0,0,0,2,2,2,2,2,2,0,0,0,0,0,0],
+  [0,0,0,2,2,2,2,2,2,2,2,2,0,0,0,0],
+  [0,0,3,3,1,1,1,1,1,1,1,3,3,0,0,0],
+  [0,3,1,1,1,1,1,1,1,1,1,1,3,0,0,0],
+  [0,3,1,1,1,1,1,1,1,1,1,1,3,0,0,0],
+  [0,3,1,1,1,1,1,1,1,1,1,1,3,0,0,0],
+  [0,0,3,3,1,1,1,1,1,1,1,3,3,0,0,0],
+  /* neck / shirt */
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  /* body */
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  [0,0,0,0,4,4,4,4,4,4,4,0,0,0,0,0],
+  [0,0,0,0,5,5,0,0,0,5,5,0,0,0,0,0],
+  [0,0,0,0,5,5,0,0,0,5,5,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ];
 
-/* gift (6x6), cake (6x5), book obstacle (6x4) */
 const giftSprite = [
-  [0,2,2,2,2,0],
-  [2,2,1,1,2,2],
-  [2,1,3,3,1,2],
-  [2,1,3,3,1,2],
-  [2,2,1,1,2,2],
-  [0,2,2,2,2,0]
+  [0,0,6,6,6,6,0,0],
+  [0,6,2,2,2,2,6,0],
+  [6,2,3,3,3,3,2,6],
+  [6,2,3,3,3,3,2,6],
+  [6,2,3,3,3,3,2,6],
+  [6,2,2,2,2,2,2,6],
+  [0,6,2,2,2,2,6,0],
+  [0,0,6,6,6,6,0,0]
 ];
+
 const cakeSprite = [
-  [0,0,4,4,0,0],
-  [0,4,1,1,4,0],
-  [4,1,2,2,1,4],
-  [4,1,1,1,1,4],
-  [0,4,4,4,4,0]
+  [0,0,0,7,7,7,0,0],
+  [0,0,7,2,2,2,7,0],
+  [0,7,2,3,3,2,2,7],
+  [7,2,3,4,4,3,2,7],
+  [7,2,3,3,3,3,2,7],
+  [0,7,2,2,2,2,7,0],
+  [0,0,7,7,7,7,0,0]
 ];
+
 const bookSprite = [
-  [0,6,6,6,6,0],
-  [6,1,1,1,1,6],
-  [6,1,1,1,1,6],
-  [0,6,6,6,6,0]
+  [0,8,8,8,8,8,8,0],
+  [8,2,2,2,2,2,2,8],
+  [8,2,2,2,2,2,2,8],
+  [8,2,2,2,2,2,2,8],
+  [8,2,2,2,2,2,2,8],
+  [0,8,8,8,8,8,8,0]
 ];
 
-/* Palettes: index -> color (use PLAYER_COLORS where appropriate) */
-function paletteHero() {
-  return [null, PLAYER_COLORS.skin, PLAYER_COLORS.hair, PLAYER_COLORS.shirt, PLAYER_COLORS.pants, "#333", "#a14a4a"];
+function paletteHero(){
+  return [null, PLAYER_COLORS.skin, PLAYER_COLORS.skin, PLAYER_COLORS.hair, PLAYER_COLORS.shirt, PLAYER_COLORS.pants, "#ffd500","#ffcad4","#6b8cff"];
 }
-const giftPalette = [null, "#fff0c8", "#ff2d55", "#ffd700", "#f8c8a0", "#000"];
-const cakePalette = [null, "#fff0c8", "#ff6f61", "#ffe0b2", "#fff"];
-const bookPalette = [null, "#fff0c8", "#e9e9e9", "#a1a1a1", "#d4d4d4", "#000"];
+const giftPalette = [null, "#fff0c8","#ffebcd","#d42f5f","#f2a654","#8b3b55","#b21"];
+const cakePalette = [null, "#000","#ffe8c6","#ff6f61","#ffd29c","#fff"];
+const bookPalette = [null, "#fff0c8","#cfcfcf","#8b5a4b","#2b2b2b","#000",""];
 
-/* Player object */
-const player = {
-  w: heroSprite[0].length * 2, // will be scaled with scale when drawing
-  h: heroSprite.length * 2,
-  x: 140,
-  y: 0,
-  vx: 0,
-  speed: 3,
-  alive: true
-};
+/* GAME STATE */
+const player = { x: 180, y:0, vx:0, speed:4 };
+let items = [], lastSpawn = 0, spawnInterval = 900, score = 0, running=false, lastTime=0, victory=false;
 
-/* Items array */
-let items = []; // {x,y,type,vy}
-let lastSpawn = 0;
-let spawnInterval = 900; // ms
-let score = 0;
-let running = false;
-let lastTime = 0;
-let showMessages = [];
-let victory = false;
-
-/* draw background and static hud */
+/* draw background */
 function drawStatic(){
-  // simple starry background
-  ctx.fillStyle = "#08121a";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  // gradient floor
-  const g = ctx.createLinearGradient(0,canvas.height*0.65,0,canvas.height);
-  g.addColorStop(0,"rgba(255,255,255,0.02)");
-  g.addColorStop(1,"rgba(0,0,0,0.3)");
-  ctx.fillStyle = g;
-  ctx.fillRect(0,canvas.height*0.65,canvas.width,canvas.height*0.35);
+  // deep background
+  ctx.fillStyle = "#06121a"; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // stars
+  for (let i=0;i<30;i++){
+    ctx.fillStyle = "rgba(255,255,255,0.03)";
+    const sx = (i*73) % canvas.width, sy = ((i*41)+120) % (canvas.height*0.6);
+    ctx.fillRect(sx, sy, 1, 1);
+  }
+  // ground
+  ctx.fillStyle = "#071826";
+  ctx.fillRect(0,canvas.height*0.78, canvas.width, canvas.height*0.22);
 }
 
-/* draw everything each frame */
+/* draw frame */
 function render(){
   drawStatic();
-
   // draw player (center bottom)
-  player.drawX = Math.max(8, Math.min(canvas.width - (heroSprite[0].length*scale)-8, player.x));
-  player.drawY = canvas.height - (heroSprite.length*scale) - 28;
-  drawPixelSprite(heroSprite, paletteHero(), Math.round(player.drawX), Math.round(player.drawY));
+  const heroW = heroSprite[0].length*scale, heroH = heroSprite.length*scale;
+  player.drawX = Math.max(8, Math.min(canvas.width - heroW - 8, player.x));
+  player.drawY = canvas.height - heroH - 38;
+  drawPixel(heroSprite, paletteHero(), Math.round(player.drawX), Math.round(player.drawY));
 
   // draw items
   items.forEach(it=>{
-    if (it.type === "gift") drawPixelSprite(giftSprite, giftPalette, Math.round(it.x), Math.round(it.y));
-    if (it.type === "cake") drawPixelSprite(cakeSprite, cakePalette, Math.round(it.x), Math.round(it.y));
-    if (it.type === "book") drawPixelSprite(bookSprite, bookPalette, Math.round(it.x), Math.round(it.y));
+    if (it.type === "gift") drawPixel(giftSprite, giftPalette, Math.round(it.x), Math.round(it.y));
+    if (it.type === "cake") drawPixel(cakeSprite, cakePalette, Math.round(it.x), Math.round(it.y));
+    if (it.type === "book") drawPixel(bookSprite, bookPalette, Math.round(it.x), Math.round(it.y));
   });
 
-  // draw score and small text on canvas
-  ctx.fillStyle = "#d1f2ff";
-  ctx.font = `${12}px ${"Courier New"}`;
+  // HUD text (drawn on canvas)
+  ctx.fillStyle = "#dff6ff";
+  ctx.font = `${12}px Courier New`;
   ctx.fillText(`Score: ${score} / ${TARGET_SCORE}`, 12, 18);
 }
 
-/* update positions */
+/* spawn items */
+function spawnItem(){
+  const x = Math.random() * (canvas.width - 80) + 16;
+  const r = Math.random();
+  let type = "gift";
+  if (r > 0.86) type = "book";
+  else if (r > 0.55) type = "cake";
+  items.push({ x: Math.round(x), y: -40, vy: 1.2 + Math.random()*1.8, type });
+  // slightly speed up spawn as score increases
+  spawnInterval = Math.max(450, 900 - score * 28);
+}
+
+/* update */
 function update(dt){
-  // move player
   player.x += player.vx * player.speed;
-  // clamp
-  player.x = Math.max(4, Math.min(player.x, canvas.width - heroSprite[0].length*scale - 4));
+  player.x = Math.max(6, Math.min(player.x, canvas.width - heroSprite[0].length*scale - 6));
 
-  // spawn
-  if (Date.now() - lastSpawn > spawnInterval) {
-    lastSpawn = Date.now();
-    spawnItem();
-  }
+  if (Date.now() - lastSpawn > spawnInterval) { lastSpawn = Date.now(); spawnItem(); }
 
-  // update items
-  for (let i = items.length -1; i>=0; i--){
+  for (let i=items.length-1;i>=0;i--){
     const it = items[i];
     it.y += it.vy * (dt/16);
-    // collision check with player (rough box check)
+    // size depending on sprite
+    const iw = 8*scale, ih = (it.type==="cake"?7: (it.type==="book"?6:8))*scale;
     const px = player.drawX, py = player.drawY, pw = heroSprite[0].length*scale, ph = heroSprite.length*scale;
-    const ix = it.x, iy = it.y, iw = (it.type==="book"?6:6)*scale, ih = (it.type==="cake"?5:6)*scale;
-    if (iy+ih >= py && iy <= py+ph && ix+iw >= px && ix <= px+pw) {
-      // collision
+    if (it.y + ih >= py && it.y <= py + ph && it.x + iw >= px && it.x <= px + pw) {
       if (it.type === "gift" || it.type === "cake") {
         score = Math.min(TARGET_SCORE, score+1);
-        beep(900 - Math.random()*200, 0.06);
+        playSfxCollect();
         pushMessage(collectMessage(score));
-      } else if (it.type === "book") {
+      } else {
         score = Math.max(0, score-1);
-        beep(220, 0.12);
+        playSfxHit();
         pushMessage("Ugh — a boring book! -1");
       }
       items.splice(i,1);
       scoreEl.textContent = `Score: ${score} / ${TARGET_SCORE}`;
-      if (score >= TARGET_SCORE && !victory) {
-        triggerVictory();
-      }
+      if (score >= TARGET_SCORE && !victory) triggerVictory();
       continue;
     }
-    // remove if below
-    if (it.y > canvas.height + 40) items.splice(i,1);
+    if (it.y > canvas.height + 30) items.splice(i,1);
   }
 }
 
-/* spawn random item */
-function spawnItem(){
-  const x = Math.random() * (canvas.width - 40) + 8;
-  const r = Math.random();
-  let type = "gift";
-  if (r > 0.85) type = "book";
-  else if (r > 0.6) type = "cake";
-  items.push({ x: Math.round(x), y: -30, vy: 1.4 + Math.random()*1.4, type });
-}
-
-/* collect messages */
+/* messages */
 function collectMessage(currScore){
-  const lines = [
-    "Nice catch! One more cake coming 🍰",
-    "Sweet! Abdullah's stash grows!",
-    "No emails today — birthday power!", 
-    "Power up! Almost there!",
-    "Legendary catch! Keep going!",
-    "You're on fire — cake magnet!",
-    "Looking pro, Abdullah!"
-  ];
-  // choose by score to add variety:
-  return (currScore % 2 === 0) ? lines[currScore % lines.length] : lines[Math.floor(Math.random()*lines.length)];
+  const lines = ["Nice catch! One more cake coming!","Sweet! Abdullah's stash grows!","No emails today — birthday power!","Power up! Almost there!","Legendary catch!","You're a cake magnet!","Looking pro, Abdullah!"];
+  return lines[currScore % lines.length];
 }
+function pushMessage(msg){ showFloatMessage(msg, 1300); }
 
-function pushMessage(msg){
-  showFloatMessage(msg, 1500);
-}
-
-/* main loop */
+/* GAME LOOP */
 function loop(t){
   if (!running) return;
   const dt = t - lastTime || 16;
@@ -418,121 +358,126 @@ function loop(t){
   if (!victory) requestAnimationFrame(loop);
 }
 
-/* controls: keyboard and touch */
-document.addEventListener("keydown", (e)=>{
-  if (!running) return;
-  if (e.key === "ArrowLeft" || e.key === "a") player.vx = -1;
-  if (e.key === "ArrowRight" || e.key === "d") player.vx = 1;
-});
-document.addEventListener("keyup", (e)=>{
-  if (!running) return;
-  if ((e.key === "ArrowLeft" && player.vx<0) || (e.key === "ArrowRight" && player.vx>0) || e.key === "a" || e.key === "d") player.vx = 0;
-});
+/* Controls: keyboard + touch */
+document.addEventListener("keydown",(e)=>{ if (!running) return; if (e.key==="ArrowLeft"||e.key==="a") player.vx = -1; if (e.key==="ArrowRight"||e.key==="d") player.vx = 1; });
+document.addEventListener("keyup",(e)=>{ if (!running) return; if ((e.key==="ArrowLeft"&&player.vx<0)||(e.key==="ArrowRight"&&player.vx>0)||e.key==="a"||e.key==="d") player.vx = 0; });
 
-/* simple touch controls: left half and right half */
-canvas.addEventListener("pointerdown", (e)=>{
-  if (!running) return;
-  const r = canvas.getBoundingClientRect();
-  const cx = e.clientX - r.left;
-  player.vx = cx < canvas.width/2 ? -1 : 1;
-  e.preventDefault();
-});
-canvas.addEventListener("pointerup", (e)=>{
-  if (!running) return;
-  player.vx = 0;
-});
+canvas.addEventListener("pointerdown",(e)=>{ if (!running) return; const r=canvas.getBoundingClientRect(); const cx=e.clientX - r.left; player.vx = cx < canvas.width/2 ? -1 : 1; e.preventDefault(); });
+canvas.addEventListener("pointerup",(e)=>{ if (!running) return; player.vx = 0; });
 
-/* start the game UI: hide dialogue, show canvas and HUD */
+/* Start game UI */
 function startGameUI(){
   document.getElementById("dialogue").classList.add("hidden");
   hud.classList.remove("hidden");
   canvas.classList.remove("hidden");
   document.getElementById("finalBox").classList.add("hidden");
-  // reset state then run
   resetGame();
-  running = true;
-  lastTime = performance.now();
-  requestAnimationFrame(loop);
+  running = true; lastTime = performance.now(); requestAnimationFrame(loop);
 }
+window.startGameUI = startGameUI;
 
-/* reset game state */
+/* Reset */
 function resetGame(){
-  items = [];
-  lastSpawn = 0;
-  score = 0;
-  victory = false;
+  items = []; lastSpawn = 0; score = 0; victory=false;
   scoreEl.textContent = `Score: ${score} / ${TARGET_SCORE}`;
-  player.x = Math.max(8, (canvas.width/2) - (heroSprite[0].length*scale)/2);
+  player.x = (canvas.width/2) - (heroSprite[0].length*scale)/2;
   player.vx = 0;
 }
 
-/* victory fireworks and final message */
+/* Victory */
 function triggerVictory(){
-  victory = true;
-  running = false;
-  // small victory sound
-  beep(880, 0.12);
-  setTimeout(()=>{ beep(1320, 0.08); }, 120);
-  // show fireworks animation for a short period
-  runFireworks(2000, ()=> {
-    // show final screen
+  victory = true; running = false;
+  playSfxVictory();
+  setTimeout(()=>{ runFireworks(2400, ()=> {
     document.getElementById("finalText").innerHTML = `🎉 <strong>HAPPY 17th BIRTHDAY, ${NAME.toUpperCase()}</strong> 🎂<br><small style="font-weight:600">Wishing you a year of joy, success, and endless cake 🍰</small>`;
     document.getElementById("finalBox").classList.remove("hidden");
     hud.classList.add("hidden");
-  });
+  }); }, 200);
 }
 
-/* simple oscillator beep */
-function beep(freq=440, dur=0.08){
-  try {
-    const ctxA = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctxA.createOscillator();
-    const g = ctxA.createGain();
-    o.type = "square";
-    o.frequency.value = freq;
-    o.connect(g);
-    g.connect(ctxA.destination);
-    g.gain.setValueAtTime(0.0001, ctxA.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.12, ctxA.currentTime + 0.01);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001, ctxA.currentTime + dur);
-    setTimeout(()=>{ o.stop(); ctxA.close(); }, dur*1000 + 50);
-  } catch(e) { /* audio blocked or unsupported */ }
+/* Sound system: background chiptune + sfx */
+let audioCtx = null, musicInterval = null, musicOn = true;
+const gainNodes = { music: null, sfx: null };
+
+function ensureAudio(){
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  gainNodes.music = audioCtx.createGain(); gainNodes.sfx = audioCtx.createGain();
+  gainNodes.music.gain.value = 0.06; gainNodes.sfx.gain.value = 0.12;
+  gainNodes.music.connect(audioCtx.destination); gainNodes.sfx.connect(audioCtx.destination);
 }
 
-/* small fireworks using particles */
+/* chiptune loop (simple arpeggio melody) */
+function startMusic(){
+  if (!musicOn) return;
+  ensureAudio();
+  if (musicInterval) return;
+  const pattern = [440, 523.25, 659.25, 587.33, 523.25, 440]; // A4, C5, E5, D5...
+  let i=0;
+  musicInterval = setInterval(()=>{
+    const freq = pattern[i % pattern.length];
+    simpleTone(freq, 0.14, 'sine', 0.0005, gainNodes.music);
+    i++;
+  }, 220);
+}
+function stopMusic(){
+  clearInterval(musicInterval); musicInterval = null;
+}
+
+/* play short tone */
+function simpleTone(freq=440, dur=0.1, type='square', attack=0.01, targetGain=null){
+  ensureAudio();
+  const ctxA = audioCtx;
+  const o = ctxA.createOscillator();
+  const g = ctxA.createGain();
+  o.type = type; o.frequency.value = freq;
+  o.connect(g); g.connect(targetGain || gainNodes.sfx);
+  g.gain.setValueAtTime(0.0001, ctxA.currentTime);
+  g.gain.linearRampToValueAtTime(1.0, ctxA.currentTime + attack);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ctxA.currentTime + dur);
+  setTimeout(()=>{ try{ o.stop(); }catch(e){} }, dur*1000 + 50);
+}
+
+/* SFX wrappers */
+function playSfxCollect(){ simpleTone(880 - Math.random()*180, 0.08, 'triangle'); }
+function playSfxHit(){ simpleTone(220, 0.18, 'sawtooth'); }
+function playSfxVictory(){ simpleTone(880, 0.22, 'square'); setTimeout(()=>simpleTone(1320,0.18,'square'),120); }
+
+/* Mute toggle button */
+const muteBtn = document.getElementById("muteBtn");
+muteBtn.onclick = ()=>{
+  musicOn = !musicOn;
+  muteBtn.textContent = musicOn ? "🔊 Music: On" : "🔈 Music: Off";
+  if (musicOn) { startMusic(); } else { stopMusic(); }
+};
+
+/* initial music start (requires user gesture in some browsers) */
+document.addEventListener('pointerdown', ()=>{ if (!audioCtx) { startMusic(); } }, { once:true });
+
+/* Fireworks */
 function runFireworks(duration=2000, done){
   const particles = [];
   const centerX = canvas.width/2, centerY = canvas.height/3;
-  // create many particles
-  for (let i=0;i<80;i++){
+  for (let i=0;i<110;i++){
     const angle = Math.random()*Math.PI*2;
-    const speed = 1 + Math.random()*4;
-    particles.push({
-      x:centerX, y:centerY,
-      vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
-      life: 100 + Math.random()*60,
-      color: `hsl(${Math.floor(Math.random()*360)},80%,60%)`
-    });
+    const speed = 1 + Math.random()*5;
+    particles.push({ x:centerX, y:centerY, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, life: 90 + Math.random()*80, color: `hsl(${Math.floor(Math.random()*360)},84%,60%)` });
   }
   const start = performance.now();
   function fw(t){
     const elapsed = t - start;
-    // clear small area
     drawStatic();
-    // draw player and items a final time behind fireworks
-    drawPixelSprite(heroSprite, paletteHero(), Math.round(player.drawX), Math.round(player.drawY));
+    // draw player + items behind fireworks for nice effect
+    drawPixel(heroSprite, paletteHero(), Math.round(player.drawX), Math.round(player.drawY));
     items.forEach(it=>{
-      if (it.type === "gift") drawPixelSprite(giftSprite, giftPalette, Math.round(it.x), Math.round(it.y));
-      if (it.type === "cake") drawPixelSprite(cakeSprite, cakePalette, Math.round(it.x), Math.round(it.y));
-      if (it.type === "book") drawPixelSprite(bookSprite, bookPalette, Math.round(it.x), Math.round(it.y));
+      if (it.type === "gift") drawPixel(giftSprite, giftPalette, Math.round(it.x), Math.round(it.y));
+      if (it.type === "cake") drawPixel(cakeSprite, cakePalette, Math.round(it.x), Math.round(it.y));
+      if (it.type === "book") drawPixel(bookSprite, bookPalette, Math.round(it.x), Math.round(it.y));
     });
-    // update particles
     particles.forEach(p=>{
-      p.x += p.vx; p.y += p.vy;
-      p.vy += 0.03; p.life--;
-      ctx.fillStyle = p.color;
-      ctx.fillRect(Math.round(p.x), Math.round(p.y), 3, 3);
+      p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.life--;
+      ctx.fillStyle = p.color; ctx.fillRect(Math.round(p.x), Math.round(p.y), 4, 4);
     });
     if (elapsed < duration) requestAnimationFrame(fw);
     else { if (done) done(); }
@@ -540,24 +485,98 @@ function runFireworks(duration=2000, done){
   requestAnimationFrame(fw);
 }
 
-/* Draw static initially */
+/* initial draw */
 drawStatic();
 
-/* final screen replay button */
-document.getElementById("replayBtn").onclick = ()=>{
-  document.getElementById("finalBox").classList.add("hidden");
-  // show dialogue again or go straight to game? we'll go straight to game if user wants
-  startGameUI();
-};
+/* Float message helper & HUD updating */
+function showFloatMessage(msg, t=1400) { const el=document.getElementById("floatMsg"); el.textContent=msg; el.style.opacity=1; clearTimeout(el._t); el._t=setTimeout(()=>el.style.opacity=0,t); }
+showFloatMessage("Tip: Use arrow keys or tap left/right on screen to move.",3000);
 
-/* put playerName in HUD */
+/* Start and replay bindings */
+document.getElementById("replayBtn").onclick = ()=>{ document.getElementById("finalBox").classList.add("hidden"); startGameUI(); };
+
+/* connect Start Quest (dialogue action) */
+function startGameUI(){ document.getElementById("dialogue").classList.add("hidden"); hud.classList.remove("hidden"); canvas.classList.remove("hidden"); document.getElementById("finalBox").classList.add("hidden"); resetGame(); running=true; lastTime=performance.now(); if (musicOn) startMusic(); requestAnimationFrame(loop); }
+window.startGameUI = startGameUI;
+
+/* Generate & download certificate (canvas) */
+document.getElementById("downloadCert").onclick = generateCertificate;
+
+function generateCertificate(){
+  // draw certificate on offscreen canvas
+  const W = 1200, H = 800;
+  const c = document.createElement('canvas'); c.width=W; c.height=H;
+  const g = c.getContext('2d');
+  // background
+  g.fillStyle = "#fff9f0"; g.fillRect(0,0,W,H);
+  // border
+  g.strokeStyle = "#222"; g.lineWidth = 12; g.strokeRect(20,20,W-40,H-40);
+  // title
+  g.fillStyle = "#222"; g.font = "60px 'Courier New'"; g.textAlign="center";
+  g.fillText("Certificate of Legendary Birthday", W/2, 110);
+  // subtitle
+  g.font = "36px 'Courier New'"; g.fillText(`Awarded to: ${NAME}`, W/2, 180);
+  g.font = "28px 'Courier New'"; g.fillText(`On your 17th birthday — ${new Date().toLocaleDateString()}`, W/2, 220);
+  // draw small pixel portrait on left
+  const portraitX = 120, portraitY = 280, pScale = 8;
+  // portrait sprite (crop head portion of heroSprite)
+  const head = heroSprite.slice(0,6);
+  for (let yy=0; yy<head.length; yy++){
+    for (let xx=0; xx<head[0].length; xx++){
+      const v = head[yy][xx];
+      if (!v) continue;
+      g.fillStyle = paletteHero()[v];
+      g.fillRect(portraitX + xx*pScale, portraitY + yy*pScale, pScale, pScale);
+    }
+  }
+  // message block
+  g.font = "22px 'Courier New'"; g.textAlign="left";
+  const lines = [
+    `Happy 17th Birthday, ${NAME}!`,
+    "",
+    "You completed the quest and proved your legend status.",
+    "May this year be filled with joy, success, and endless cake.",
+    "",
+    "— With love, from your friend"
+  ];
+  let ty = portraitY;
+  for (let i=0;i<lines.length;i++){
+    g.fillText(lines[i], portraitX + 240, portraitY + (i*36));
+  }
+  // decoration: small pixel cake at bottom-right
+  // draw cake scaled
+  const cakeX = W - 260, cakeY = H - 260, cakeScale = 12;
+  for (let yy=0; yy<cakeSprite.length; yy++){
+    for (let xx=0; xx<cakeSprite[0].length; xx++){
+      const v = cakeSprite[yy][xx];
+      if (!v) continue;
+      g.fillStyle = cakePalette[v];
+      g.fillRect(cakeX + xx*cakeScale, cakeY + yy*cakeScale, cakeScale, cakeScale);
+    }
+  }
+  // footer
+  g.textAlign="center"; g.font="18px 'Courier New'"; g.fillStyle="#444";
+  g.fillText("Generated with ❤️ on GitHub Pages", W/2, H-60);
+
+  // download
+  const data = c.toDataURL("image/png");
+  const a = document.createElement('a'); a.href = data; a.download = `Certificate_${NAME.replace(/\s+/g,'_')}_17.png`; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* hook initial HUD (score text updated during collisions) */
+scoreEl.textContent = `Score: ${score} / ${TARGET_SCORE}`;
+
+/* show start button in dialogue and choices rendering (already handled earlier) */
+/* Expose download for convenience */
 document.getElementById("playerName").textContent = NAME;
 
-/* show initial hint floating */
-showFloatMessage("Tip: Use arrow keys or tap left/right on screen to move.", 3000);
+/* Safety: attempt to start audio context only after a gesture (we already listen on first pointerdown) */
+document.addEventListener('pointerdown', ()=>{ if (!audioCtx && musicOn) startMusic(); }, { once:true });
 
-/* expose manual start for debug (useful during testing) */
-window.startGameUI = startGameUI;
+/* ===========================
+   Final: ensure dialog flow remains clickable
+   (already wired)
+   =========================== */
 
 </script>
 </body>
