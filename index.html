@@ -1,40 +1,60 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow Clone Escape</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shadow Clone Escape — Complete</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <h1>Shadow Clone Escape</h1>
 
-  <!-- Main Menu -->
   <div id="menu">
-    <p>You must reach the gold square 🟨 without touching your shadow clones 👥.</p>
-    <p>Use <b>WASD</b> or <b>Arrow Keys</b> to move.</p>
-    <button id="startBtn">Start Game</button>
+    <p class="big">Survive as long as possible in a new solvable maze each run.</p>
+    <div class="menu-row">
+      <button id="startBtn">Start Run</button>
+      <button id="tutorialBtn">Tutorial</button>
+      <button id="settingsBtn">Settings</button>
+    </div>
+
+    <div id="tutorial" class="panel" style="display:none;">
+      <p>- Move with <b>WASD</b> or <b>Arrow Keys</b>. Smooth movement is enabled.</p>
+      <p>- Avoid clones (they replay your past path). Touching one = Game Over.</p>
+      <p>- Collect power-ups: <i>Speed</i>, <i>Cloak</i>, <i>Freeze</i>.</p>
+    </div>
+
+    <div id="settings" class="panel" style="display:none;">
+      <label><input type="checkbox" id="musicToggle" checked> Music</label><br>
+      <label><input type="checkbox" id="sfxToggle" checked> SFX</label><br>
+      <label>Difficulty: <input id="difficulty" type="range" min="0" max="2" step="1" value="1"></label>
+      <p style="font-size:13px;color:#ccc">Easy ←  Normal  → Hard</p>
+    </div>
+
+    <p id="bestRecordText">Best: —</p>
   </div>
 
-  <!-- Game Area -->
-  <canvas id="gameCanvas" width="600" height="600" style="display:none;"></canvas>
-  
+  <canvas id="gameCanvas" width="720" height="600" style="display:none;"></canvas>
+
   <div id="ui" style="display:none;">
-    <p id="status">Reach the gold square to escape!</p>
-    <p id="timer">Time: 0s</p>
-    <button id="restartBtn" style="display:none;">Restart</button>
+    <div class="hud">
+      <div id="status">Survive as long as you can</div>
+      <div id="timer">Time: 0s</div>
+      <div id="powerupBox"></div>
+    </div>
+    <div class="menu-row">
+      <button id="restartBtn" style="display:none;">Restart</button>
+      <button id="menuBtn" style="display:none;">Back to Menu</button>
+    </div>
   </div>
 
-  <!-- Background music + sounds -->
+  <!-- Audio -->
   <audio id="bgMusic" loop>
     <source src="https://cdn.pixabay.com/audio/2022/11/02/audio_dfe97b58c8.mp3" type="audio/mpeg">
   </audio>
-  <audio id="winSound">
-    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c78a3a7f0f.mp3" type="audio/mpeg">
-  </audio>
-  <audio id="loseSound">
-    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_13a2f2f5a4.mp3" type="audio/mpeg">
-  </audio>
+  <audio id="spawnSfx"><source src="https://cdn.pixabay.com/audio/2021/08/08/audio_ef4f9f1b0a.mp3" type="audio/mpeg"></audio>
+  <audio id="deathSfx"><source src="https://cdn.pixabay.com/audio/2022/03/15/audio_13a2f2f5a4.mp3" type="audio/mpeg"></audio>
+  <audio id="pickupSfx"><source src="https://cdn.pixabay.com/audio/2022/07/07/audio_d0f9ab3d3c.mp3" type="audio/mpeg"></audio>
+  <audio id="newRecordSfx"><source src="https://cdn.pixabay.com/audio/2022/07/07/audio_d0f9ab3d3c.mp3" type="audio/mpeg"></audio>
 
   <script src="script.js"></script>
 </body>
