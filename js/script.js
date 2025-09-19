@@ -93,26 +93,24 @@ function gameLoop() {
     }
   }
 
-  // Spawn clones
-  if (frameCount % cloneInterval === 0 && movesHistory.length > 0) {
-    clones.push(new Clone(movesHistory));
-  }
-
-  // Update & draw clones
+  // Draw clones
   for (let clone of clones) {
     clone.update();
     clone.draw();
-
-    // Collision check
     if (clone.x === player.x && clone.y === player.y) {
       statusText.textContent = "☠️ You were caught by your shadow clone!";
-      return; // stop game loop
+      return;
     }
   }
 
   // Draw player
   ctx.fillStyle = player.color;
   ctx.fillRect(player.x * tileSize, player.y * tileSize, tileSize, tileSize);
+
+  // Spawn clones
+  if (frameCount % cloneInterval === 0 && movesHistory.length > 0) {
+    clones.push(new Clone(movesHistory));
+  }
 
   // Check win condition
   if (maze[player.y][player.x] === 2) {
@@ -123,4 +121,4 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+requestAnimationFrame(gameLoop);
