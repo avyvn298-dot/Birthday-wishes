@@ -1,3 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adventure Game</title>
+<style>
+  body { margin:0; background:#04121a; color:#e8fbff; font-family:Courier, monospace; overflow:hidden; }
+  canvas { display:block; margin:0 auto; background:#04121a; }
+  #hud { position:fixed; top:10px; left:10px; z-index:10; }
+  #dialogue { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:80%; max-width:600px; background:rgba(0,0,0,0.6); padding:12px 16px; border-radius:12px; display:none; color:white; }
+  #dialogueChoices button { margin-right:8px; }
+  #dialogueContinue { margin-top:8px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="score">Score: 0 / 17</div>
+  <div id="playerName">Player</div>
+</div>
+
+<div id="dialogue">
+  <div id="dialogueText"></div>
+  <div id="dialogueChoices"></div>
+  <div id="dialogueContinue">[Click to continue]</div>
+</div>
+
+<canvas id="game" width="800" height="500"></canvas>
+
 <script>
 /* ===========================
    CONFIG & CONSTANTS
@@ -9,7 +39,7 @@ const HAIR_COLOR = "#2b1a0e";
 const SKIN_COLOR = "#f0d6b6";
 
 /* Difficulty / tuning */
-let DIFFICULTY = 1.0; // 1.0 normal; >1 harder
+let DIFFICULTY = 1.0;
 
 /* Player / physics */
 const PLAYER_SPEED = 3.6;
@@ -47,16 +77,17 @@ let items = [];
 let enemies = [];
 
 /* ===========================
-   Sprites & Palettes
+   SPRITES & PALETTES
    =========================== */
-// ... Keep your heroSprite, giftSprite, cakeSprite, bookSprite, alarmSprite, enemySprite
-// and corresponding palette arrays here (unchanged)
+const heroSprite = [
+  [0,1,1,1,0],
+  [1,2,2,2,1],
+  [0,3,4,3,0],
+  [0,4,4,4,0]
+];
 
 function heroPalette(){ return [null, SKIN_COLOR, HAIR_COLOR, SKIN_COLOR, SHIRT_COLOR, "#1b1b1b"]; }
 
-/* ===========================
-   HELPER FUNCTIONS
-   =========================== */
 function drawPixelSprite(sprite, palette, dx, dy, scale=3){
   for (let yy=0; yy<sprite.length; yy++){
     for (let xx=0; xx<sprite[0].length; xx++){
@@ -68,10 +99,12 @@ function drawPixelSprite(sprite, palette, dx, dy, scale=3){
   }
 }
 
+/* ===========================
+   HELPER FUNCTIONS
+   =========================== */
 function worldToScreen(wx){ return Math.round(wx - cameraX); }
 function rectsOverlap(ax,ay,aw,ah,bx,by,bw,bh){ return ax < bx+bw && ax+aw > bx && ay<by+bh && ay+ah > by; }
 
-/* Floating text (single version) */
 function showFloatingText(text, worldX){
   const el = document.createElement('div');
   el.textContent = text; el.style.position='fixed';
@@ -113,19 +146,6 @@ function makeWorld(){
     }
   });
 
-  for (let k=0;k<6;k++){
-    items.push({x: 1200+k*40+Math.random()*30, y:200+Math.random()*60, type:(k%2===0?'gift':'cake'), picked:false});
-  }
-
-  const obstacleTypes = ['book','alarm'];
-  for (let p of platforms){
-    if (Math.random()<0.5 && p !== platforms[0]){
-      const ox = p.x + 20 + Math.random()*(p.w-40);
-      const near = items.some(it=>Math.abs(it.x-ox)<80);
-      if (!near) items.push({x:ox, y:p.y-(8*3), type:obstacleTypes[Math.floor(Math.random()*obstacleTypes.length)], picked:false});
-    }
-  }
-
   enemies = [
     {x:500, y:260, vx:1.2*DIFFICULTY, range:[480,720]},
     {x:980, y:280, vx:1.4*DIFFICULTY, range:[920,1200]},
@@ -139,14 +159,6 @@ function makeWorld(){
 function draw(){
   ctx.fillStyle="#04121a"; ctx.fillRect(0,0,canvasW,canvasH);
 
-  // stars
-  for (let s=0;s<40;s++){
-    ctx.fillStyle = `rgba(255,255,255,${0.01+(s%6)*0.01})`;
-    const sx = ((s*73) - cameraX*0.08)%canvasW;
-    const sy = (40+(s*17))%(canvasH*0.5);
-    ctx.fillRect(sx,sy,1,1);
-  }
-
   // platforms
   for (let p of platforms){
     const sx=worldToScreen(p.x), sy=p.y, sw=p.w, sh=p.h;
@@ -154,34 +166,19 @@ function draw(){
     ctx.fillStyle="#0d4960"; ctx.fillRect(sx,sy,sw,6);
   }
 
-  // items
-  for (let it of items){
-    if (it.picked) continue;
-    const sx=worldToScreen(it.x), sy=it.y;
-    if (it.type==='gift') drawPixelSprite(giftSprite, giftPalette, sx, sy,3);
-    if (it.type==='cake') drawPixelSprite(cakeSprite, cakePalette, sx, sy,3);
-    if (it.type==='book') drawPixelSprite(bookSprite, bookPalette, sx, sy,3);
-    if (it.type==='alarm') drawPixelSprite(alarmSprite, alarmPalette, sx, sy,3);
-  }
-
-  // enemies
-  for (let en of enemies) drawPixelSprite(enemySprite, enemyPalette, worldToScreen(en.x), en.y, 3);
-
   // player
   drawPixelSprite(heroSprite, heroPalette(), worldToScreen(player.x), player.drawY, 3);
 
-  // HUD inside canvas
   ctx.fillStyle="#e8fbff"; ctx.font="16px Courier New";
   ctx.fillText(`Score: ${player.score} / ${TARGET_SCORE}`,10,22);
   ctx.fillText(NAME, canvasW-220,22);
 }
 
-/* update physics & collisions */
 function update(dt){
-  player.x += player.vx * (PLAYER_SPEED*DIFFICULTY);
+  player.x += player.vx * PLAYER_SPEED;
   player.x = Math.max(6, Math.min(player.x, WORLD_W - player.w - 6));
 
-  player.vy += GRAVITY*DIFFICULTY;
+  player.vy += GRAVITY;
   player.y += player.vy;
   player.onGround=false;
 
@@ -190,77 +187,29 @@ function update(dt){
       if (player.vy>0 && (player.y+player.h-player.vy)<=p.y+6){
         player.y=p.y-player.h;
         player.vy=0; player.onGround=true;
-      } else {
-        if (player.x+player.w/2 < p.x+p.w/2) player.x=p.x-player.w-0.1;
-        else player.x=p.x+p.w+0.1;
       }
     }
   }
   player.drawY=Math.round(player.y);
 
-  // enemies & collisions
-  for (let en of enemies){
-    en.x += en.vx;
-    if (en.x<en.range[0] || en.x>en.range[1]) en.vx*=-1;
-    const enW=10*3, enH=8*3;
-    if (rectsOverlap(player.x,player.y,player.w,player.h,en.x,en.y,enW,enH)){
-      player.vy=-8;
-      player.vx=(player.x<en.x)?-1.5:1.5;
-      player.score=Math.max(0,player.score-1);
-      playSfxHit();
-      showFloatingText("-1",player.x);
-      updateScore();
-    }
-  }
-
-  // items collection
-  for (let it of items){
-    if (it.picked) continue;
-    if (ASSIST_ON && (it.type==='gift'||it.type==='cake')){
-      const dx=player.x-it.x, dy=player.y-it.y, dist=Math.hypot(dx,dy);
-      if (dist<220){ it.x+=dx*0.06; it.y+=dy*0.04; }
-    }
-    const iw=(it.type==='cake'?7*3:8*3), ih=(it.type==='cake'?7*3:8*3);
-    if (rectsOverlap(player.x,player.y,player.w,player.h,it.x,it.y,iw,ih)){
-      if (it.type==='book'||it.type==='alarm'){ player.score=Math.max(0,player.score-1); playSfxHit(); showFloatingText("-1",it.x); }
-      else { player.score=Math.min(TARGET_SCORE,player.score+1); playSfxCollect(); showFloatingText("+1",it.x); }
-      it.picked=true; updateScore();
-      if (player.score>=TARGET_SCORE) triggerVictory();
-    }
-  }
-
-  // camera
   const center=canvasW/2;
   const targetCam=Math.max(0, Math.min(player.x-center+player.w/2, WORLD_W-canvasW));
   cameraX += (targetCam-cameraX)*0.12;
 }
 
-/* game loop */
 function loop(t){ if(!running) return; if(!lastTime) lastTime=t; const dt=t-lastTime; lastTime=t; update(dt); draw(); requestAnimationFrame(loop); }
 
-/* ===========================
-   SOUND, MUSIC, SFX
-   =========================== */
-// ... Keep your existing simpleTone(), startMusic(), stopMusic(), SFX functions here
-
-/* ===========================
-   DIALOGUE & QUEST
-   =========================== */
-// ... Keep your existing showScriptNext(), typeText(), startQuest() logic here
-
-/* ===========================
-   INPUT HANDLING
-   =========================== */
-// ... Keep your keyboard & mobile controls logic here
-
-/* ===========================
-   RESIZE & INIT
-   =========================== */
 function resizeCanvas(){ canvasW=canvas.width=Math.min(920,Math.floor(window.innerWidth*0.94)); canvasH=canvas.height=Math.floor(canvasW*0.63); }
 window.addEventListener('resize', ()=>{ resizeCanvas(); draw(); });
 resizeCanvas();
-updateScore();
 
-window._assist=()=>{ toggleAssist(); };
-window.addEventListener('error',(e)=>{ console.error('GAME ERROR',e.error||e.message); alert('There was an error in the game console. Open DevTools and check console.'); });
+/* ===========================
+   START GAME
+   =========================== */
+makeWorld();
+running=true;
+requestAnimationFrame(loop);
 </script>
+
+</body>
+</html>
