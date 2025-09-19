@@ -3,15 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catch the Cake 🎂</title>
+  <title>Birthday Surprise 🎂</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       background: linear-gradient(to top, #ff9a9e, #fecfef);
-      overflow: hidden;
       font-family: "Comic Sans MS", cursive, sans-serif;
       text-align: center;
+      overflow: hidden;
+    }
+    #story, #game, #finalMessage {
+      display: none;
+      margin-top: 50px;
+    }
+    #story h1 {
+      font-size: 2em;
+      color: #ff4081;
+    }
+    #story button, #finalMessage button {
+      padding: 12px 24px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 10px;
+      background: #ff6f61;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    #story button:hover, #finalMessage button:hover {
+      background: #ff4081;
     }
     canvas {
       background: #fff7f0;
@@ -20,104 +41,143 @@
       border: 3px solid #ff6f61;
       border-radius: 12px;
     }
-    #message {
+    #finalMessage {
       font-size: 2em;
       color: #ff4081;
       font-weight: bold;
-      margin-top: 20px;
-      display: none;
     }
   </style>
 </head>
 <body>
-  <h1>Catch the Cake 🎂</h1>
-  <p>Use ⬅️ and ➡️ arrow keys to move</p>
-  <canvas id="gameCanvas" width="400" height="500"></canvas>
-  <div id="message">🎉 Happy Birthday, Bestie! 🎂</div>
+
+  <!-- Story intro -->
+  <div id="story">
+    <h1>👋 Hi Abdullah!</h1>
+    <p>I know it’s your birthday today 🎉</p>
+    <p>Want a present? 🎁</p>
+    <p>Nah nah… not so fast 😜</p>
+    <p>First you must play a little game 🎮</p>
+    <button onclick="startGame()">Let’s Play!</button>
+  </div>
+
+  <!-- Game section -->
+  <div id="game">
+    <h2>Catch the Cake 🎂</h2>
+    <p>Use ⬅️ and ➡️ arrow keys to move</p>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <p id="scoreDisplay">Score: 0</p>
+  </div>
+
+  <!-- Final birthday message -->
+  <div id="finalMessage">
+    <h1>🎉 Happy Birthday, Abdullah Naveed 🎂</h1>
+    <p>Wishing you joy, laughter, and all the cake in the world! 🍰</p>
+    <button onclick="location.reload()">Play Again 🎮</button>
+  </div>
 
   <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    // Show intro first
+    document.getElementById("story").style.display = "block";
 
-    let basket = { x: 170, y: 450, w: 60, h: 20, dx: 0 };
-    let cakes = [];
-    let score = 0;
-
-    function drawBasket() {
-      ctx.fillStyle = "#ff6f61";
-      ctx.fillRect(basket.x, basket.y, basket.w, basket.h);
+    function startGame() {
+      document.getElementById("story").style.display = "none";
+      document.getElementById("game").style.display = "block";
+      runGame();
     }
 
-    function drawCakes() {
-      ctx.fillStyle = "#ffcc00";
-      cakes.forEach(cake => {
-        ctx.beginPath();
-        ctx.arc(cake.x, cake.y, cake.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
+    function runGame() {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
 
-    function newCake() {
-      cakes.push({
-        x: Math.random() * (canvas.width - 20) + 10,
-        y: 0,
-        r: 10,
-        dy: 2
-      });
-    }
+      let basket = { x: 170, y: 450, w: 60, h: 20, dx: 0 };
+      let cakes = [];
+      let score = 0;
 
-    function moveBasket() {
-      basket.x += basket.dx;
-      if (basket.x < 0) basket.x = 0;
-      if (basket.x + basket.w > canvas.width) basket.x = canvas.width - basket.w;
-    }
+      function drawBasket() {
+        ctx.fillStyle = "#ff6f61";
+        ctx.fillRect(basket.x, basket.y, basket.w, basket.h);
+      }
 
-    function updateCakes() {
-      cakes.forEach((cake, i) => {
-        cake.y += cake.dy;
-        if (
-          cake.y + cake.r > basket.y &&
-          cake.x > basket.x &&
-          cake.x < basket.x + basket.w
-        ) {
-          cakes.splice(i, 1);
-          score++;
-          if (score >= 5) {
-            document.getElementById("message").style.display = "block";
+      function drawCakes() {
+        ctx.fillStyle = "#ffcc00";
+        cakes.forEach(cake => {
+          ctx.beginPath();
+          ctx.arc(cake.x, cake.y, cake.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#ff6f61";
+          ctx.fillRect(cake.x - cake.r / 2, cake.y, cake.r, 5); // cake base
+          ctx.fillStyle = "#ffcc00";
+        });
+      }
+
+      function newCake() {
+        cakes.push({
+          x: Math.random() * (canvas.width - 20) + 10,
+          y: 0,
+          r: 15,
+          dy: 2
+        });
+      }
+
+      function moveBasket() {
+        basket.x += basket.dx;
+        if (basket.x < 0) basket.x = 0;
+        if (basket.x + basket.w > canvas.width) basket.x = canvas.width - basket.w;
+      }
+
+      function updateCakes() {
+        cakes.forEach((cake, i) => {
+          cake.y += cake.dy;
+          if (
+            cake.y + cake.r > basket.y &&
+            cake.x > basket.x &&
+            cake.x < basket.x + basket.w
+          ) {
+            cakes.splice(i, 1);
+            score++;
+            document.getElementById("scoreDisplay").innerText = "Score: " + score;
+            if (score >= 5) {
+              endGame();
+            }
           }
-        }
-        if (cake.y > canvas.height) {
-          cakes.splice(i, 1);
-        }
+          if (cake.y > canvas.height) {
+            cakes.splice(i, 1);
+          }
+        });
+      }
+
+      function drawScore() {
+        ctx.fillStyle = "#333";
+        ctx.font = "20px Arial";
+        ctx.fillText("Score: " + score, 10, 20);
+      }
+
+      function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBasket();
+        drawCakes();
+        drawScore();
+        moveBasket();
+        updateCakes();
+        requestAnimationFrame(gameLoop);
+      }
+
+      function endGame() {
+        document.getElementById("game").style.display = "none";
+        document.getElementById("finalMessage").style.display = "block";
+      }
+
+      document.addEventListener("keydown", e => {
+        if (e.key === "ArrowLeft") basket.dx = -5;
+        if (e.key === "ArrowRight") basket.dx = 5;
       });
+      document.addEventListener("keyup", e => {
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight") basket.dx = 0;
+      });
+
+      setInterval(newCake, 1500);
+      gameLoop();
     }
-
-    function drawScore() {
-      ctx.fillStyle = "#333";
-      ctx.font = "20px Arial";
-      ctx.fillText("Score: " + score, 10, 20);
-    }
-
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawBasket();
-      drawCakes();
-      drawScore();
-      moveBasket();
-      updateCakes();
-      requestAnimationFrame(gameLoop);
-    }
-
-    document.addEventListener("keydown", e => {
-      if (e.key === "ArrowLeft") basket.dx = -5;
-      if (e.key === "ArrowRight") basket.dx = 5;
-    });
-    document.addEventListener("keyup", e => {
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight") basket.dx = 0;
-    });
-
-    setInterval(newCake, 1500);
-    gameLoop();
   </script>
 </body>
 </html>
