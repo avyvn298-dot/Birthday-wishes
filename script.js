@@ -3,6 +3,9 @@ const ctx = canvas.getContext("2d");
 const statusText = document.getElementById("status");
 const timerText = document.getElementById("timer");
 const restartBtn = document.getElementById("restartBtn");
+const startBtn = document.getElementById("startBtn");
+const menu = document.getElementById("menu");
+const ui = document.getElementById("ui");
 
 // Sounds
 const bgMusic = document.getElementById("bgMusic");
@@ -11,8 +14,6 @@ const loseSound = document.getElementById("loseSound");
 
 // Grid settings
 const tileSize = 30;
-const gridWidth = canvas.width / tileSize;
-const gridHeight = canvas.height / tileSize;
 
 // Game state
 let player, movesHistory, clones, frameCount, cloneInterval, running, startTime;
@@ -32,7 +33,7 @@ let maze = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
-// Player & clone setup
+// Reset game
 function resetGame() {
   player = { x: 1, y: 1, color: "lime" };
   movesHistory = [];
@@ -43,8 +44,7 @@ function resetGame() {
   startTime = Date.now();
   statusText.textContent = "Reach the gold square to escape!";
   restartBtn.style.display = "none";
-  bgMusic.currentTime = 0;
-  bgMusic.play();
+  timerText.textContent = "Time: 0s";
 }
 
 // Controls
@@ -115,7 +115,7 @@ function gameLoop() {
   // Spawn new clones (faster over time)
   if (frameCount % cloneInterval === 0 && movesHistory.length > 0) {
     clones.push(new Clone(movesHistory));
-    if (cloneInterval > 120) cloneInterval -= 20; // increase difficulty
+    if (cloneInterval > 120) cloneInterval -= 20;
   }
 
   // Update & draw clones
@@ -160,12 +160,21 @@ function gameOver(win) {
   restartBtn.style.display = "inline-block";
 }
 
-// Restart
+// Restart button
 restartBtn.addEventListener("click", () => {
   resetGame();
   requestAnimationFrame(gameLoop);
+  bgMusic.currentTime = 0;
+  bgMusic.play();
 });
 
-// Start game
-resetGame();
-requestAnimationFrame(gameLoop);
+// Start button
+startBtn.addEventListener("click", () => {
+  menu.style.display = "none";
+  canvas.style.display = "block";
+  ui.style.display = "block";
+  resetGame();
+  requestAnimationFrame(gameLoop);
+  bgMusic.currentTime = 0;
+  bgMusic.play();
+});
