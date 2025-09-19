@@ -3,79 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Abdullah's Birthday Game</title>
+<title>Abdullah's 17th Birthday Quest</title>
 <style>
-body { margin:0; background:#06131b; color:#fff; font-family:monospace; text-align:center; }
-canvas { display:block; margin:20px auto; background:#04121a; border:3px solid #fff; }
+body { margin:0; background:#06131b; color:#fff; font-family:monospace; text-align:center; overflow:hidden;}
+canvas { display:block; margin:0 auto; background:#04121a; border:3px solid #fff; }
+#intro, #dialogue { position:absolute; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.7); padding:20px; border-radius:10px;}
 button { font-size:16px; padding:6px 12px; margin:6px; cursor:pointer; }
+#score { position:absolute; top:10px; left:10px; font-size:18px; }
+#assistBtn { position:absolute; top:10px; right:10px; }
 </style>
 </head>
 <body>
 
 <h1>Abdullah's 17th Birthday Quest 🎂</h1>
+
 <div id="intro">
   <p>Hi Abdullah! Ready for your birthday quest?</p>
   <button id="startBtn">Start Quest</button>
 </div>
 
+<div id="dialogue" style="display:none;"></div>
+<div id="score">Score: 0</div>
+<button id="assistBtn">Assist: OFF</button>
+
 <canvas id="game" width="800" height="400"></canvas>
 
+<audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_e1e8aa0b6d.mp3?filename=mystery-11299.mp3"></audio>
+
 <script>
+// ===== Canvas Setup =====
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('startBtn');
-let player = { x:50, y:350, w:20, h:30, vy:0, onGround:true, score:0 };
+const dialogueDiv = document.getElementById('dialogue');
+const scoreDiv = document.getElementById('score');
+const assistBtn = document.getElementById('assistBtn');
+const bgm = document.getElementById('bgm');
+
+let assistMode = false;
+assistBtn.onclick = () => { assistMode=!assistMode; assistBtn.textContent = "Assist: " + (assistMode?"ON":"OFF"); };
+
+// ===== Player & Physics =====
+let player = { x:50, y:350, w:20, h:30, vy:0, onGround:true, score:0, color:"#2a9df4" };
 let gravity = 0.6;
 let keys = {};
-let items = [{x:200,y:350,type:'gift'}, {x:400,y:350,type:'cake'}, {x:600,y:350,type:'gift'}];
 
+// ===== World & Items =====
+let items = [
+  {x:200,y:350,type:'gift', collected:false},
+  {x:400,y:350,type:'cake', collected:false},
+  {x:600,y:350,type:'gift', collected:false}
+];
+let obstacles = [
+  {x:300,y:370,w:20,h:20},
+  {x:500,y:370,w:20,h:20}
+];
+
+// ===== Dialogue =====
+let dialogue = [
+  {text:"Hi Abdullah, it's your birthday!", choices:["Next"]},
+  {text:"Do you want a special present?", choices:["Yes","Nah"]},
+  {text:"First, complete the quest and collect gifts!", choices:["Let's go!"]}
+];
+let dialogueIndex = 0;
+
+// ===== Event Listeners =====
 startBtn.onclick = () => {
   document.getElementById('intro').style.display = 'none';
-  requestAnimationFrame(loop);
+  dialogueDiv.style.display = 'block';
+  showDialogue();
+  bgm.play();
 };
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
 
-document.addEventListener('keydown', e => { keys[e.key] = true; });
-document.addEventListener('keyup', e => { keys[e.key] = false; });
+// ===== Dialogue Functions =====
+function showDialogue() {
+  dialogueDiv.innerHTML = `<p>${dialogue[dialogueIndex].text}</p>` +
+    dialogue[dialogueIndex].choices.map((c,i)=>`<button onclick="nextDialogue(${i})">${c}</button>`).join('');
+}
+function nextDialogue(choice){
+  dialogueIndex++;
+  if(dialogueIndex>=dialogue.length){ dialogueDiv.style.display='none'; requestAnimationFrame(loop); }
+  else showDialogue();
+}
 
+// ===== Game Loop =====
 function loop(){
   update();
   draw();
   requestAnimationFrame(loop);
 }
 
+// ===== Update =====
 function update(){
-  // left/right
+  // player movement
   if(keys['ArrowLeft']) player.x -= 4;
   if(keys['ArrowRight']) player.x += 4;
-  // jump
   if(keys['ArrowUp'] && player.onGround){ player.vy = -10; player.onGround=false; }
   player.vy += gravity;
   player.y += player.vy;
-  if(player.y > 370){ player.y = 370; player.vy=0; player.onGround=true; }
+  if(player.y > 370){ player.y=370; player.vy=0; player.onGround=true; }
+
+  // assist mode moves items closer
+  if(assistMode){
+    items.forEach(it => {
+      if(!it.collected){
+        let dx = player.x - it.x;
+        let dy = player.y - it.y;
+        it.x += dx*0.05;
+        it.y += dy*0.05;
+      }
+    });
+  }
 
   // collect items
   items.forEach(it => {
     if(!it.collected && player.x < it.x+20 && player.x+player.w>it.x && player.y < it.y+20 && player.y+player.h>it.y){
       it.collected = true;
       player.score++;
-      console.log("Collected "+it.type+"! Score:", player.score);
+      scoreDiv.textContent = "Score: " + player.score;
       if(player.score === items.length){
-        alert("🎉 Happy 17th Birthday Abdullah! You collected all gifts! 🎉");
+        victory();
       }
     }
   });
 }
 
+// ===== Draw =====
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+  
+  // background stars
+  for(let i=0;i<50;i++){
+    ctx.fillStyle="#fff";
+    ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height, 1,1);
+  }
+
   // player
-  ctx.fillStyle = "#2a9df4"; ctx.fillRect(player.x, player.y, player.w, player.h);
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
   // items
   items.forEach(it => {
     if(it.collected) return;
     ctx.fillStyle = it.type==='gift'?'#ff0':'#ff69b4';
     ctx.fillRect(it.x,it.y,20,20);
   });
+
+  // obstacles
+  ctx.fillStyle="#ff4500";
+  obstacles.forEach(ob => ctx.fillRect(ob.x, ob.y, ob.w, ob.h));
+}
+
+// ===== Victory =====
+function victory(){
+  alert("🎉 Happy 17th Birthday Abdullah! You collected all gifts! 🎉");
+  // fireworks effect
+  for(let i=0;i<100;i++){
+    setTimeout(()=>{ 
+      ctx.fillStyle = `hsl(${Math.random()*360},100%,50%)`;
+      ctx.fillRect(Math.random()*canvas.width, Math.random()*canvas.height,5,5);
+    }, i*30);
+  }
+  // certificate
+  setTimeout(()=>{
+    let link = document.createElement('a');
+    let cert = `<html><body><h1 style="color:blue;">Certificate of Awesome 🎉</h1>
+      <p>Abdullah Naveed completed the ultimate birthday quest on his 17th birthday!</p>
+    </body></html>`;
+    link.href = 'data:text/html,' + encodeURIComponent(cert);
+    link.download = "Abdullah_Birthday_Certificate.html";
+    link.click();
+  },3500);
 }
 </script>
 </body>
