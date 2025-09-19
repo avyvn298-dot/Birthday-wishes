@@ -1,1 +1,51 @@
+body {
+  background: #111;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  color: #ff4444;
+  text-shadow: 2px 2px 8px black;
+}
+
+canvas {
+  border: 2px solid #fff;
+  margin-top: 10px;
+  background: #222;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#ui {
+  margin-top: 15px;
+}
+
+#status {
+  font-size: 18px;
+  color: #00ff99;
+}
+
+#timer {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #ffcc00;
+}
+
+#restartBtn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#restartBtn:hover {
+  background: #ff6666;
+}
 
