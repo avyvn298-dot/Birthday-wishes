@@ -1,0 +1,23 @@
+body {
+  background: #111;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  color: #ff4444;
+  text-shadow: 2px 2px 5px black;
+}
+
+canvas {
+  border: 2px solid #fff;
+  margin-top: 10px;
+  background: #222;
+}
+
+#status {
+  margin-top: 15px;
+  font-size: 18px;
+  color: #00ff99;
+}
