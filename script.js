@@ -1,20 +1,21 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const statusText = document.getElementById("status");
+const timerText = document.getElementById("timer");
+const restartBtn = document.getElementById("restartBtn");
+
+// Sounds
+const bgMusic = document.getElementById("bgMusic");
+const winSound = document.getElementById("winSound");
+const loseSound = document.getElementById("loseSound");
 
 // Grid settings
 const tileSize = 30;
 const gridWidth = canvas.width / tileSize;
 const gridHeight = canvas.height / tileSize;
 
-// Player
-let player = { x: 1, y: 1, color: "lime" };
-let movesHistory = []; // store moves for clone
-
-// Clone(s)
-let clones = [];
-let cloneInterval = 300; // frames until a clone spawns
-let frameCount = 0;
+// Game state
+let player, movesHistory, clones, frameCount, cloneInterval, running, startTime;
 
 // Maze layout (1 = wall, 0 = empty, 2 = goal)
 let maze = [
@@ -31,8 +32,25 @@ let maze = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
+// Player & clone setup
+function resetGame() {
+  player = { x: 1, y: 1, color: "lime" };
+  movesHistory = [];
+  clones = [];
+  frameCount = 0;
+  cloneInterval = 300;
+  running = true;
+  startTime = Date.now();
+  statusText.textContent = "Reach the gold square to escape!";
+  restartBtn.style.display = "none";
+  bgMusic.currentTime = 0;
+  bgMusic.play();
+}
+
 // Controls
 document.addEventListener("keydown", (e) => {
+  if (!running) return;
+
   let newX = player.x;
   let newY = player.y;
 
@@ -48,7 +66,7 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Clone object
+// Clone class
 class Clone {
   constructor(path) {
     this.path = [...path];
@@ -72,11 +90,12 @@ class Clone {
   }
 }
 
-// Game Loop
+// Game loop
 function gameLoop() {
+  if (!running) return;
+
   frameCount++;
 
-  // Clear screen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw maze
@@ -93,20 +112,19 @@ function gameLoop() {
     }
   }
 
-  // Spawn clones
+  // Spawn new clones (faster over time)
   if (frameCount % cloneInterval === 0 && movesHistory.length > 0) {
     clones.push(new Clone(movesHistory));
+    if (cloneInterval > 120) cloneInterval -= 20; // increase difficulty
   }
 
   // Update & draw clones
   for (let clone of clones) {
     clone.update();
     clone.draw();
-
-    // Collision check
     if (clone.x === player.x && clone.y === player.y) {
-      statusText.textContent = "☠️ You were caught by your shadow clone!";
-      return; // stop game loop
+      gameOver(false);
+      return;
     }
   }
 
@@ -114,13 +132,40 @@ function gameLoop() {
   ctx.fillStyle = player.color;
   ctx.fillRect(player.x * tileSize, player.y * tileSize, tileSize, tileSize);
 
-  // Check win condition
+  // Check win
   if (maze[player.y][player.x] === 2) {
-    statusText.textContent = "🎉 You escaped the maze!";
+    gameOver(true);
     return;
   }
+
+  // Timer
+  let elapsed = Math.floor((Date.now() - startTime) / 1000);
+  timerText.textContent = "Time: " + elapsed + "s";
 
   requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+// Game over
+function gameOver(win) {
+  running = false;
+  bgMusic.pause();
+
+  if (win) {
+    statusText.textContent = "🎉 You escaped the maze!";
+    winSound.play();
+  } else {
+    statusText.textContent = "☠️ You were caught by your shadow clone!";
+    loseSound.play();
+  }
+  restartBtn.style.display = "inline-block";
+}
+
+// Restart
+restartBtn.addEventListener("click", () => {
+  resetGame();
+  requestAnimationFrame(gameLoop);
+});
+
+// Start game
+resetGame();
+requestAnimationFrame(gameLoop);
