@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday 🎉</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ff9a9e, #fad0c4);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: white;
+    }
+    h1 {
+      font-size: 3em;
+      text-shadow: 2px 2px 8px #000;
+    }
+    p {
+      font-size: 1.5em;
+    }
+    .balloon {
+      position: absolute;
+      bottom: -150px;
+      width: 60px;
+      height: 80px;
+      border-radius: 50%;
+      background: red;
+      animation: float 8s infinite ease-in;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-110vh); }
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 12px;
+      background: #fff;
+      color: #ff4b2b;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ff4b2b;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎉 Happy Birthday, Bestie! 🎂</h1>
+  <p>Wishing you joy, laughter, and all the cake in the world!</p>
+  <button onclick="playMusic()">Click for a Surprise 🎵</button>
+  
+  <canvas id="confetti"></canvas>
+
+  <script>
+    // Balloons
+    function createBalloon(color) {
+      const balloon = document.createElement("div");
+      balloon.classList.add("balloon");
+      balloon.style.background = color;
+      balloon.style.left = Math.random() * window.innerWidth + "px";
+      balloon.style.animationDuration = (5 + Math.random() * 5) + "s";
+      document.body.appendChild(balloon);
+      setTimeout(() => balloon.remove(), 10000);
+    }
+    setInterval(() => createBalloon(
+      `hsl(${Math.random()*360}, 70%, 60%)`
+    ), 1000);
+
+    // Confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = Array.from({length: 200}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      w: 5,
+      h: 10,
+      color: `hsl(${Math.random()*360}, 70%, 60%)`,
+      speed: 2 + Math.random()*3
+    }));
+    function drawConfetti() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      pieces.forEach(p => {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+        p.y += p.speed;
+        if (p.y > canvas.height) p.y = -10;
+      });
+      requestAnimationFrame(drawConfetti);
+    }
+    drawConfetti();
+
+    // Music
+    function playMusic() {
+      const audio = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+      audio.play();
+    }
+  </script>
+</body>
+</html>
