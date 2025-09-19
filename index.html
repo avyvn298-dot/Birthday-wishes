@@ -2,58 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Abdullah's 17th Birthday Quest — Ultimate</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Abdullah's 17th Birthday Quest — Final</title>
 <style>
   :root{
-    --bg-a:#08121a; --bg-b:#072733; --ui:#e6fbff; --accent:#ff6f61;
-    --ui-muted: rgba(230,251,255,0.15);
+    --bg1:#06131b; --bg2:#0c2b3f; --ui:#e8fbff; --accent:#ff6f61;
     --pixel-font: "Courier New", monospace;
   }
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg-a),var(--bg-b));font-family:var(--pixel-font);color:var(--ui);-webkit-font-smoothing:antialiased}
-  .wrap{max-width:980px;margin:12px auto;padding:12px;text-align:center}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:var(--ui);font-family:var(--pixel-font);}
+  .wrap{max-width:980px;margin:12px auto;padding:12px;text-align:center;}
   h1{margin:6px 0;font-size:20px}
-  .dialogue{width:min(920px,96%);margin:10px auto;background:rgba(0,0,0,0.58);padding:14px;border-radius:8px;border:2px solid rgba(255,255,255,0.04);text-align:left}
-  .dialogue .text{min-height:56px;font-size:18px}
+  .dialogue{width:min(920px,96%);margin:10px auto;background:rgba(0,0,0,0.55);padding:14px;border-radius:8px;border:3px solid rgba(255,255,255,0.03);text-align:left}
+  .dialogue .text{min-height:56px}
   .choices{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-  .btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-  #hud{display:flex;justify-content:space-between;align-items:center;max-width:920px;margin:10px auto;color:var(--ui)}
-  #game{display:block;margin:12px auto;border:6px solid rgba(0,0,0,0.4);background:#020814;border-radius:12px}
-  .controlsMobile{display:none;position:fixed;left:0;right:0;bottom:8px;justify-content:space-between;padding:0 24px;pointer-events:none}
-  .controlBtn{width:64px;height:64px;border-radius:12px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ui);pointer-events:auto}
-  .mutebtn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--ui);padding:6px 10px;border-radius:6px;cursor:pointer}
+  .btn{ background:var(--accent); color:#fff; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; font-weight:700; }
+  canvas{display:block;margin:12px auto;border:6px solid #041b26;background:#04121a;border-radius:10px;max-width:100%}
+  .hud{max-width:920px;margin:6px auto;display:flex;justify-content:space-between;align-items:center;color:var(--ui)}
+  .mutebtn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--ui);padding:6px 8px;border-radius:6px;cursor:pointer}
+  .assistBtn{position:fixed;right:16px;top:16px;background:transparent;border:2px solid rgba(255,255,255,0.06);color:var(--ui);padding:8px;border-radius:10px;cursor:pointer}
+  .controlsMobile{display:none;position:fixed;left:0;right:0;bottom:8px;justify-content:space-between;padding:0 40px;pointer-events:none}
+  .controlBtn{width:72px;height:72px;border-radius:12px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--ui);pointer-events:auto}
   .hidden{display:none}
   @media (max-width:720px){ .controlsMobile{display:flex} .dialogue .text{font-size:16px} h1{font-size:18px} }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>🎮 Abdullah's 17th Birthday Quest — Ultimate Edition</h1>
+    <h1>🎮 Abdullah's 17th Birthday Quest — 🎂 Adventure</h1>
 
     <div id="dialogue" class="dialogue" aria-live="polite">
       <div id="dialogueText" class="text"></div>
-      <div id="choices" class="choices"></div>
-      <div style="margin-top:8px;text-align:right"><button id="contBtn" class="btn hidden">Continue</button></div>
+      <div id="dialogueChoices" class="choices"></div>
+      <div style="margin-top:8px;text-align:right"><button id="dialogueContinue" class="btn hidden">Continue</button></div>
     </div>
 
-    <div id="hud" class="hidden">
+    <div id="hud" class="hud hidden">
       <div><strong id="playerName">Abdullah Naveed</strong></div>
-      <div id="scoreText">Score: 0 / 17</div>
-      <div><button id="muteBtn" class="mutebtn">🔊 Music: On</button></div>
+      <div id="score">Score: 0 / 17</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="muteBtn" class="mutebtn">🔊 Music: On</button>
+      </div>
     </div>
 
-    <canvas id="game" width="820" height="520" aria-label="Birthday game canvas"></canvas>
+    <canvas id="game" width="820" height="520" class="hidden" aria-label="Birthday game canvas"></canvas>
 
     <div id="final" class="dialogue hidden" style="text-align:center">
-      <div id="finalText" style="font-weight:900;font-size:20px"></div>
-      <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <button id="replayBtn" class="btn">Play Again</button>
+      <div id="finalText" style="font-weight:900;font-size:20px;"></div>
+      <div style="margin-top:10px">
+        <button id="playAgain" class="btn">Play Again</button>
         <button id="downloadCert" class="btn">Download Certificate</button>
       </div>
     </div>
   </div>
 
-  <!-- Mobile controls -->
+  <button id="assistBtn" class="assistBtn" title="Assist (make it easy) ❤️">❤️ Assist: Off</button>
+
+  <!-- mobile controls -->
   <div class="controlsMobile" id="mobileControls">
     <div class="controlBtn" id="leftBtn">◀</div>
     <div class="controlBtn" id="jumpBtn">⬆</div>
@@ -61,132 +65,60 @@
   </div>
 
 <script>
-/* =========================
+/* ===========================
    CONFIG
-   ========================= */
+   =========================== */
 const NAME = "Abdullah Naveed";
 const TARGET_SCORE = 17;
-const SHIRT = "#2aa1f8";
-const HAIR = "#2b1a0e";
-const SKIN = "#f0d6b6";
+const SHIRT_COLOR = "#2a9df4";
+const HAIR_COLOR = "#2b1a0e";
+const SKIN_COLOR = "#f0d6b6";
+/* Difficulty / tuning */
+let DIFFICULTY = 1.0; // 1.0 normal; >1 harder
+/* =========================== */
 
-/* Difficulty tuning (you can tweak) */
-let baseSpawnInterval = 950;   // initial ms between item spawns
-let minSpawnInterval = 420;    // minimum (fast) when game scales
-let spawnDecreasePerPoint = 28; // ms less per score
-let gravity = 0.6;
-let jumpPower = -11;
-let playerSpeed = 3.6;
-/* ========================= */
-
-/* ======= Dialogue data (one sentence at a time) ======= */
+/* Dialogue script (one sentence at a time) */
 const script = [
-  { type: "text", text: `Hi ${NAME}.` },
-  { type: "text", text: `I know it's your 17th birthday today 🎂` },
-  { type: "choice", text: "Do you want your present?", choices: [
-    { label: "Yes!", reply: "Brave. We'll test your worth." },
-    { label: "Of course!", reply: "Confident — I like it." },
-    { label: "Maybe later", reply: "Procrastinators need quests too." }
+  {type:"text", text:`Hi ${NAME}.`},
+  {type:"text", text:"I know it's your birthday today 🎂"},
+  {type:"choice", text:"Do you want your present?", choices:[
+    {label:"Yes!", reply:"Confident — I like that."},
+    {label:"Of course", reply:"Sweet. But you must prove it."},
+    {label:"Maybe later", reply:"Okay, but first a quest."}
   ]},
-  { type: "text", text: "Not so fast — first a challenge." },
-  { type: "text", text: `Collect ${TARGET_SCORE} gifts & cakes. Don't get stressed by obstacles.` },
-  { type: "action", label: "Start Quest" }
+  {type:"text", text:"Collect 17 gifts & cakes across the level to unlock your surprise."},
+  {type:"text", text:"Obstacles are spaced so items are reachable — but the world is tricky."},
+  {type:"action", label:"Start Quest"}
 ];
 
-/* ======= UI elements ======= */
-const dialogEl = document.getElementById("dialogue");
-const dialogText = document.getElementById("dialogueText");
-const choicesEl = document.getElementById("choices");
-const contBtn = document.getElementById("contBtn");
-const hud = document.getElementById("hud");
-const scoreText = document.getElementById("scoreText");
-document.getElementById("playerName").textContent = NAME;
+/* === DOM refs === */
+const dialogue = document.getElementById('dialogue');
+const dialogueText = document.getElementById('dialogueText');
+const dialogueChoices = document.getElementById('dialogueChoices');
+const dialogueContinue = document.getElementById('dialogueContinue');
+const hud = document.getElementById('hud');
+const scoreEl = document.getElementById('score');
+const playerNameEl = document.getElementById('playerName');
+playerNameEl.textContent = NAME;
 
-/* ======= Canvas setup ======= */
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d", { alpha:false });
-let cw = canvas.width, ch = canvas.height;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d', { alpha: false });
+let canvasW = canvas.width, canvasH = canvas.height;
 
-/* Camera/world */
-const WORLD_W = 2200; // long world for exploration
-let cameraX = 0;
+/* Camera / world */
+const WORLD_W = 1600;
 
-/* ======= Player (tiny Abdullah) ======= */
-const player = {
-  x: 80, y: 360, w: 20, h: 28,
-  vx: 0, vy: 0, onGround: false,
-  score: 0
-};
+/* Player (platformer) */
+const player = { x:80, y:300, vx:0, vy:0, w:16, h:24, onGround:false, score:0 };
 
-/* ======= Level platforms (rects) ======= */
+/* Platforms (x,y,w,h in world coords) */
 let platforms = [];
-function buildPlatforms(){
-  platforms = [
-    {x:0, y:420, w: WORLD_W, h:80}, // ground
-    {x:200, y:340, w:160, h:16},
-    {x:420, y:300, w:140, h:16},
-    {x:640, y:260, w:180, h:16},
-    {x:920, y:320, w:160, h:16},
-    {x:1180, y:280, w:140, h:16},
-    {x:1420, y:340, w:120, h:16},
-    {x:1600, y:300, w:180, h:16},
-    {x:1880, y:320, w:200, h:16}
-  ];
-}
 
-/* ======= Items & obstacles (spawned across world) ======= */
-let items = []; // {x,y,type,vy,picked,anim}
-let enemies = []; // moving obstacles
-let lastSpawn = 0;
+/* Items and enemies */
+let items = []; // {x,y,type,picked}
+let enemies = []; // {x,y,vx,range}
 
-function createInitialItems(){
-  items = [];
-  // create spaced, easy-to-distinguish placement:
-  // place many collectibles, but also obstacles; obstacles are spaced apart
-  let x = 260;
-  while (x < WORLD_W - 300) {
-    // spawn between 1-3 collectibles grouped, then one obstacle
-    const group = 1 + Math.floor(Math.random()*3);
-    for (let i=0;i<group;i++){
-      const t = Math.random() < 0.6 ? "gift" : "cake";
-      items.push({x: x + i*60 + Math.random()*20, y: (Math.random()*100)+120, type: t, vy: 0, picked:false, anim:0});
-    }
-    // add obstacle with larger gap to make collectible pickup easier
-    x += 60 * group + 180 + Math.random()*140;
-    const obsType = (Math.random() < 0.6) ? "book" : "alarm";
-    items.push({x: x, y: 120 + Math.random()*200, type: obsType, vy:0, picked:false, anim:0, dangerous:true});
-    x += 40 + Math.random()*120;
-  }
-
-  // ensure at least TARGET_SCORE collectables:
-  let collectCount = items.filter(it=>it.type==='gift' || it.type==='cake').length;
-  let addX = WORLD_W - 200;
-  while (collectCount < TARGET_SCORE) {
-    items.push({x:addX, y:180 + Math.random()*80, type:'cake', vy:0, picked:false, anim:0});
-    collectCount++; addX -= 60;
-  }
-
-  // moving enemies (stress monsters) placed in tougher zones
-  enemies = [
-    {x:560, y: 280, vx: 1.2, range:[520,720]},
-    {x:1000, y: 300, vx: 1.6, range:[980,1160]},
-    {x:1500, y: 320, vx: 1.1, range:[1480,1680]},
-  ];
-}
-
-/* ======= Pixel sprite draw helpers (we draw everything programmatically) ======= */
-function drawPixelGrid(grid, palette, dx, dy, s=2){
-  for (let yy=0; yy<grid.length; yy++){
-    for (let xx=0; xx<grid[0].length; xx++){
-      const v = grid[yy][xx];
-      if (!v) continue;
-      ctx.fillStyle = palette[v];
-      ctx.fillRect(Math.round(dx + xx*s), Math.round(dy + yy*s), s, s);
-    }
-  }
-}
-
-/* --- hero 16x16 sprite array --- */
+/* Sprites: arrays for pixel art (0 = transparent) - we'll reuse earlier sprites (clean & consistent) */
 const heroSprite = [
   [0,0,0,2,2,2,2,2,2,2,0,0,0,0,0,0],
   [0,0,2,2,2,2,2,2,2,2,2,0,0,0,0,0],
@@ -205,9 +137,8 @@ const heroSprite = [
   [0,0,0,0,5,5,0,0,0,5,5,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ];
-function heroPalette(){ return [null, SKIN, HAIR, SKIN, SHIRT, "#1b1b1b"]; }
+function heroPalette(){ return [null, SKIN_COLOR, HAIR_COLOR, SKIN_COLOR, SHIRT_COLOR, "#1b1b1b"]; }
 
-/* --- gift / cake / book / alarm sprites (clear, larger) --- */
 const giftSprite = [
   [0,0,6,6,6,6,0,0],
   [0,6,2,2,2,2,6,0],
@@ -218,7 +149,7 @@ const giftSprite = [
   [0,6,2,2,2,2,6,0],
   [0,0,6,6,6,6,0,0]
 ];
-const giftPal = [null, "#fff7d9","#ffd9e0","#d43b6b","#f7a55a","#6b2d46","#c21"];
+const giftPalette = [null,"#fff7d9","#ffd9e0","#d43b6b","#f7a55a","#6b2d46"];
 
 const cakeSprite = [
   [0,0,0,7,7,7,0,0],
@@ -229,7 +160,7 @@ const cakeSprite = [
   [0,7,2,2,2,2,7,0],
   [0,0,7,7,7,7,0,0]
 ];
-const cakePal = [null, "#000","#ffe8c6","#ff6f61","#ffd29c","#fff","#000"];
+const cakePalette = [null,"#000","#ffe8c6","#ff6f61","#ffd29c","#fff"];
 
 const bookSprite = [
   [0,8,8,8,8,8,8,0],
@@ -239,7 +170,7 @@ const bookSprite = [
   [8,2,2,2,2,2,2,8],
   [0,8,8,8,8,8,8,0]
 ];
-const bookPal = [null, "#fff0c8","#d9d9d9","#a15f3d","#6b6b6b"];
+const bookPalette = [null,"#fff0c8","#d9d9d9","#a15f3d","#6b6b6b"];
 
 const alarmSprite = [
   [0,9,9,0,0,9,9,0],
@@ -251,9 +182,8 @@ const alarmSprite = [
   [0,9,9,0,0,9,9,0],
   [0,0,0,0,0,0,0,0]
 ];
-const alarmPal = [null, "#fff0c8","#ffd8b2","#ff2d55","#ffd966","#2b2b2b"];
+const alarmPalette = [null,"#fff0c8","#ffd8b2","#ff2d55","#ffd966","#2b2b2b"];
 
-/* enemy sprite (stress monster) */
 const enemySprite = [
   [0,0,11,11,11,11,0,0,0,0],
   [0,11,11,11,11,11,11,0,0,0],
@@ -264,463 +194,490 @@ const enemySprite = [
   [0,11,11,11,11,11,11,0,0,0],
   [0,0,11,11,11,11,0,0,0,0]
 ];
-const enemyPal = [null, "#ffd6c6","#a83b3b","#ffd6c6","#000","#000"];
+const enemyPalette = [null,"#ffd6c6","#a83b3b","#ffd6c6","#000","#000","#000","#ff5a5a"];
 
-/* ======= Sound: WebAudio music + SFX ======= */
-let audioCtx = null, musicTick = null, musicOn = true;
-function ensureAudio(){ if (audioCtx) return; audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+/* pixel draw helper */
+function drawPixelSprite(sprite, palette, dx, dy, scale=3){
+  for (let yy=0; yy<sprite.length; yy++){
+    for (let xx=0; xx<sprite[0].length; xx++){
+      const v = sprite[yy][xx];
+      if (!v) continue;
+      ctx.fillStyle = palette[v];
+      ctx.fillRect(Math.round(dx + xx*scale), Math.round(dy + yy*scale), scale, scale);
+    }
+  }
+}
 
-function simpleTone(freq, dur=0.12, type='sine', vol=0.07){
+/* convert world -> screen */
+let cameraX = 0;
+function worldToScreen(wx){ return Math.round(wx - cameraX); }
+
+/* create platforms & scatter items across them (ensures items & obstacles are apart) */
+function makeWorld(){
+  platforms = [
+    {x:0, y:440, w: WORLD_W, h:80},
+    {x:120, y:360, w:220, h:16},
+    {x:420, y:300, w:160, h:16},
+    {x:620, y:240, w:180, h:16},
+    {x:880, y:320, w:180, h:16},
+    {x:1160, y:260, w:200, h:16},
+    {x:1360, y:340, w:200, h:16}
+  ];
+
+  // place items on platforms with gaps (so obstacles don't overlap collectibles)
+  items = [];
+  const collectibleTypes = ['gift','cake'];
+  platforms.forEach((p,i)=>{
+    if (i===0) return; // skip ground for placing most items
+    const spots = Math.max(1, Math.floor(p.w / 120));
+    for (let s=0; s<spots; s++){
+      const px = p.x + 30 + s * (p.w / spots);
+      // alternate gift/cake
+      const t = collectibleTypes[(s + i) % collectibleTypes.length];
+      items.push({x: px + (Math.random()*30-15), y: p.y - (8*3) - (Math.random()*6), type: t, picked:false});
+    }
+  });
+
+  // spread a few extra collectibles near the end to ensure target reachable
+  for (let k=0;k<6;k++){
+    items.push({x: 1200 + k*40 + Math.random()*30, y: 200 + Math.random()*60, type: (k%2===0?'gift':'cake'), picked:false});
+  }
+
+  // obstacles placed separately (books/alarms) - ensure distance from collectibles
+  const obstacleTypes = ['book','alarm'];
+  for (let p of platforms){
+    // place 0 or 1 obstacle per platform randomly, but ensure not too close to items
+    if (Math.random() < 0.5 && p !== platforms[0]){
+      const ox = p.x + 20 + Math.random() * (p.w - 40);
+      // check distance to existing items; if too close skip
+      const near = items.some(it => Math.abs(it.x - ox) < 80);
+      if (!near) {
+        items.push({x: ox, y: p.y - (8*3), type: obstacleTypes[Math.floor(Math.random()*obstacleTypes.length)], picked:false});
+      }
+    }
+  }
+
+  // enemies patrol ranges
+  enemies = [
+    {x:500, y: 260, vx: 1.2*DIFFICULTY, range:[480, 720]},
+    {x:980, y: 280, vx: 1.4*DIFFICULTY, range:[920, 1200]},
+    {x:1320, y: 300, vx: 1.1*DIFFICULTY, range:[1260, 1440]}
+  ];
+}
+
+/* draw frame */
+function draw(){
+  // background
+  ctx.fillStyle = "#04121a"; ctx.fillRect(0,0,canvasW,canvasH);
+
+  // parallax stars
+  for (let s=0;s<40;s++){
+    ctx.fillStyle = `rgba(255,255,255,${0.01 + (s%6)*0.01})`;
+    const sx = ( (s*73) - cameraX*0.08 ) % canvasW;
+    const sy = (40 + (s*17)) % (canvasH*0.5);
+    ctx.fillRect(sx, sy, 1, 1);
+  }
+
+  // platforms
+  for (let p of platforms){
+    const sx = worldToScreen(p.x), sy = p.y, sw = p.w, sh = p.h;
+    ctx.fillStyle = "#08303f"; ctx.fillRect(sx, sy, sw, sh);
+    ctx.fillStyle = "#0d4960"; ctx.fillRect(sx, sy, sw, 6);
+  }
+
+  // items
+  for (let it of items){
+    if (it.picked) continue;
+    const sx = worldToScreen(it.x);
+    const sy = it.y;
+    if (it.type === 'gift') drawPixelSprite(giftSprite, giftPalette, sx, sy, 3);
+    if (it.type === 'cake') drawPixelSprite(cakeSprite, cakePalette, sx, sy, 3);
+    if (it.type === 'book') drawPixelSprite(bookSprite, bookPalette, sx, sy, 3);
+    if (it.type === 'alarm') drawPixelSprite(alarmSprite, alarmPalette, sx, sy, 3);
+  }
+
+  // enemies
+  for (let en of enemies){
+    drawPixelSprite(enemySprite, enemyPalette, worldToScreen(en.x), en.y, 3);
+  }
+
+  // player
+  const px = worldToScreen(player.x);
+  drawPixelSprite(heroSprite, heroPalette(), px, player.drawY, 3);
+
+  // HUD inside canvas
+  ctx.fillStyle = "#e8fbff";
+  ctx.font = "16px Courier New";
+  ctx.fillText(`Score: ${player.score} / ${TARGET_SCORE}`, 10, 22);
+  ctx.fillText(NAME, canvasW - 220, 22);
+}
+
+/* physics & collision helpers */
+function rectsOverlap(ax,ay,aw,ah, bx,by,bw,bh){
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+}
+
+/* update loop */
+let lastTime = 0, running = false;
+function update(dt){
+  // horizontal movement
+  player.x += player.vx * (PLAYER_SPEED * DIFFICULTY);
+  // clamp
+  player.x = Math.max(6, Math.min(player.x, WORLD_W - player.w - 6));
+
+  // gravity & vertical
+  player.vy += GRAVITY * DIFFICULTY;
+  player.y += player.vy;
+  player.onGround = false;
+
+  // platform collisions
+  for (let p of platforms){
+    if (rectsOverlap(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)){
+      if (player.vy > 0 && (player.y + player.h - player.vy) <= p.y + 6){
+        player.y = p.y - player.h;
+        player.vy = 0;
+        player.onGround = true;
+      } else {
+        // sideways push
+        if (player.x + player.w/2 < p.x + p.w/2) player.x = p.x - player.w - 0.1;
+        else player.x = p.x + p.w + 0.1;
+      }
+    }
+  }
+  player.drawY = Math.round(player.y);
+
+  // update enemies
+  for (let en of enemies){
+    en.x += en.vx;
+    if (en.x < en.range[0] || en.x > en.range[1]) en.vx *= -1;
+    // enemy collision
+    const enW = 10*3, enH = 8*3;
+    if (rectsOverlap(player.x, player.y, player.w, player.h, en.x, en.y, enW, enH)){
+      // knockback and penalty
+      player.vy = -8;
+      player.vx = (player.x < en.x) ? -1.5 : 1.5;
+      player.score = Math.max(0, player.score - 1);
+      playSfxHit();
+      showFloatingText("-1", player.x);
+      updateScore();
+    }
+  }
+
+  // items collection: if Assist mode on, nearby collectibles drift to player
+  for (let it of items){
+    if (it.picked) continue;
+    // optional assist
+    if (ASSIST_ON && (it.type === 'gift' || it.type === 'cake')){
+      const dx = player.x - it.x;
+      const dy = (player.y - it.y);
+      const dist = Math.hypot(dx, dy);
+      if (dist < 220) {
+        it.x += dx * 0.06;
+        it.y += dy * 0.04;
+      }
+    }
+
+    // collision test: item size ~ (8*3 x 6~7*3)
+    const iw = (it.type==='cake'?7*3:8*3), ih = (it.type==='cake'?7*3:8*3);
+    if (rectsOverlap(player.x, player.y, player.w, player.h, it.x, it.y, iw, ih)){
+      if (it.type==='book' || it.type==='alarm'){
+        player.score = Math.max(0, player.score - 1);
+        playSfxHit();
+        showFloatingText("-1", it.x);
+      } else {
+        player.score = Math.min(TARGET_SCORE, player.score + 1);
+        playSfxCollect();
+        showFloatingText("+1", it.x);
+      }
+      it.picked = true;
+      updateScore();
+      if (player.score >= TARGET_SCORE) {
+        triggerVictory();
+      }
+    }
+  }
+
+  // camera follow
+  const center = canvasW/2;
+  const targetCam = Math.max(0, Math.min(player.x - center + player.w/2, WORLD_W - canvasW));
+  cameraX += (targetCam - cameraX) * 0.12;
+}
+
+/* game loop */
+function loop(t){
+  if (!running) return;
+  if (!lastTime) lastTime = t;
+  const dt = t - lastTime;
+  lastTime = t;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* ====== Sound / music ====== */
+let audioCtx = null, musicTick = 0, musicHandle = null;
+function ensureAudio(){
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function simpleTone(freq=440, dur=0.12, type='sine', gain=0.08){
   try{
     ensureAudio();
     const o = audioCtx.createOscillator();
     const g = audioCtx.createGain();
     o.type = type; o.frequency.value = freq;
     o.connect(g); g.connect(audioCtx.destination);
-    g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
+    g.gain.setValueAtTime(0.0001,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(gain, audioCtx.currentTime+0.01);
     o.start();
     g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-    setTimeout(()=>{ try{ o.stop(); }catch(e){} }, dur*1000 + 40);
+    setTimeout(()=>{ try{o.stop();}catch(e){} }, dur*1000+50);
   }catch(e){}
 }
 
-/* music: suspenseful/adventurous loop using arpeggio */
+/* chiptune-ish background: simple pattern, uses interval */
 function startMusic(){
-  if (!musicOn) return;
+  if (!MUSIC_ON) return;
   ensureAudio();
-  if (musicTick) return;
-  const seq = [220, 277.18, 329.63, 415.30, 349.23, 277.18];
-  let i=0;
-  musicTick = setInterval(()=>{ 
-    // layered tones for atmosphere
-    simpleTone(seq[i%seq.length],0.34,'sine',0.02);
-    simpleTone(seq[(i+2)%seq.length]*2,0.14,'square',0.02);
-    i++;
+  if (musicHandle) return;
+  const pattern = [440, 523.25, 659.25, 587.33, 523.25, 880];
+  musicHandle = setInterval(()=>{
+    const f = pattern[musicTick % pattern.length] * (1 + 0.02*Math.sin(performance.now()/500));
+    simpleTone(f, 0.22, 'square', 0.03);
+    musicTick++;
   }, 300);
 }
-function stopMusic(){ clearInterval(musicTick); musicTick=null; }
+function stopMusic(){ if (musicHandle) clearInterval(musicHandle); musicHandle = null; }
 
-/* SFX wrappers */
-function sfxCollect(){ simpleTone(920 - Math.random()*200, 0.08, 'triangle', 0.06); }
-function sfxHit(){ simpleTone(220, 0.18, 'sawtooth', 0.12); }
-function sfxVictory(){ simpleTone(880,0.22,'square',0.12); setTimeout(()=>simpleTone(1320,0.16,'square',0.08),120); }
+/* SFX */
+function playSfxCollect(){ simpleTone(920 - Math.random()*120, 0.09, 'triangle', 0.06); }
+function playSfxHit(){ simpleTone(220, 0.18, 'sawtooth', 0.12); }
+function playSfxVictory(){ simpleTone(960, 0.22, 'sine', 0.12); setTimeout(()=>simpleTone(1320, 0.18,'sine',0.08),120); }
 
-/* ======= Gameplay functions ======= */
-function worldToScreen(wx){ return Math.round(wx - cameraX); }
-
-function drawBackground(){
-  ctx.fillStyle = "#020414"; ctx.fillRect(0,0,cw,ch);
-  // parallax stars / mountains
-  ctx.fillStyle = "rgba(255,255,255,0.02)";
-  for (let i=0;i<40;i++){
-    const sx = (i*37 - cameraX*0.2) % cw;
-    ctx.fillRect(sx, 20 + (i%6)*8, 1, 1);
-  }
-}
-
-/* draw platforms */
-function drawPlatforms(){
-  platforms.forEach(p=>{
-    const sx = worldToScreen(p.x);
-    ctx.fillStyle = "#08303f";
-    ctx.fillRect(sx, p.y, p.w, p.h);
-    ctx.fillStyle = "#0d4960";
-    ctx.fillRect(sx, p.y, p.w, 6);
-  });
-}
-
-/* draw items (scaled pixel sprites) */
-function drawItems(){
-  items.forEach(it=>{
-    if (it.picked) return;
-    const sx = worldToScreen(it.x);
-    const sy = it.y;
-    if (it.type === 'gift') drawPixelGrid(giftSprite, giftPal, sx, sy, 3);
-    if (it.type === 'cake') drawPixelGrid(cakeSprite, cakePal, sx, sy, 3);
-    if (it.type === 'book') drawPixelGrid(bookSprite, bookPal, sx, sy, 3);
-    if (it.type === 'alarm') drawPixelGrid(alarmSprite, alarmPal, sx, sy, 3);
-  });
-}
-
-/* draw enemies */
-function drawEnemies(){
-  enemies.forEach(en=>{
-    drawPixelGrid(enemySprite, enemyPal, worldToScreen(en.x), en.y, 3);
-  });
-}
-
-/* draw player sprite at player.x */
-function drawPlayer(){
-  const sx = worldToScreen(player.x);
-  drawPixelGrid(heroSprite, heroPalette(), sx, Math.round(player.y), 3);
-}
-
-/* render whole frame */
-function render(){
-  drawBackground();
-  drawPlatforms();
-  drawItems();
-  drawEnemies();
-  drawPlayer();
-  // HUD text overlay
-  ctx.fillStyle = "#e6fbff"; ctx.font = "16px Courier New";
-  ctx.fillText(`Score: ${player.score} / ${TARGET_SCORE}`, 12, 20);
-  ctx.fillText(NAME, cw - 180, 20);
-}
-
-/* physics & collisions */
-function rectOverlap(ax,ay,aw,ah, bx,by,bw,bh){
-  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
-}
-
-function applyPhysics(dt){
-  // horizontal movement
-  player.x += player.vx * playerSpeed;
-  // clamp
-  player.x = Math.max(8, Math.min(player.x, WORLD_W - player.w - 8));
-  // gravity
-  player.vy += gravity;
-  player.y += player.vy;
-
-  // platform collision (simple)
-  player.onGround = false;
-  for (let p of platforms){
-    if (rectOverlap(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)){
-      if (player.vy > 0 && (player.y + player.h - player.vy) <= p.y + 8){
-        player.y = p.y - player.h; player.vy = 0; player.onGround = true;
-      } else {
-        // horizontal push out
-        if (player.x + player.w/2 < p.x + p.w/2) player.x = p.x - player.w - 0.1;
-        else player.x = p.x + p.w + 0.1;
-      }
-    }
-  }
-}
-
-/* spawn floating drifting effects (items mostly static but slight bob) */
-function updateItems(dt){
-  // bob up/down and small float animation for easier grabbing
-  items.forEach(it=>{
-    if (it.picked) return;
-    it.anim = (it.anim || 0) + dt * 0.006;
-    it.y += Math.sin(it.anim) * 0.02;
-  });
-}
-
-/* check collisions between player and items */
-function checkItemCollisions(){
-  for (let it of items){
-    if (it.picked) continue;
-    // item visual size (scaled)
-    const iw = (it.type==='alarm' ? 8*3 : (it.type==='book'?8*3:8*3));
-    const ih = (it.type==='cake' ? 7*3 : iw);
-    const ix = it.x, iy = it.y;
-    // coarse collision using player's box (player.w/h are small)
-    if (rectOverlap(player.x, player.y, player.w, player.h, ix, iy, iw/3, ih/3)){
-      if (it.type === 'book' || it.type === 'alarm'){
-        // obstacle: penalty
-        player.score = Math.max(0, player.score - 1);
-        sfxHit();
-        it.picked = true;
-        showFloat("-1 (obstacle)");
-      } else {
-        // collectible
-        player.score = Math.min(TARGET_SCORE, player.score + 1);
-        sfxCollect();
-        it.picked = true;
-        spawnCollectParticles(it.x, it.y);
-        showFloat(it.type === 'cake' ? "Cake +1!" : "Gift +1!");
-      }
-      scoreText.textContent = `Score: ${player.score} / ${TARGET_SCORE}`;
-      if (player.score >= TARGET_SCORE) triggerVictory();
-    }
-  }
-}
-
-/* update enemies (moving obstacles) */
-function updateEnemies(dt){
-  enemies.forEach(en=>{
-    en.x += en.vx * (dt/16);
-    if (en.x < en.range[0] || en.x > en.range[1]) en.vx *= -1;
-    // collision with player
-    if (rectOverlap(player.x, player.y, player.w, player.h, en.x, en.y, 10*3, 8*3)){
-      player.vy = -6; player.vx = (player.x < en.x) ? -1.2 : 1.2;
-      player.score = Math.max(0, player.score - 1);
-      sfxHit();
-      showFloat("-1 (hit)");
-      scoreText.textContent = `Score: ${player.score} / ${TARGET_SCORE}`;
-    }
-  });
-}
-
-/* camera */
-function updateCamera(){
-  const center = cw/2;
-  const target = Math.max(0, Math.min(player.x - center + player.w/2, WORLD_W - cw));
-  cameraX += (target - cameraX) * 0.14;
-}
-
-/* /particles for collect */
-let particles = [];
-function spawnCollectParticles(x,y){
-  for (let i=0;i<18;i++){
-    particles.push({
-      x: x + Math.random()*12 - 6,
-      y: y + Math.random()*12 - 6,
-      vx: (Math.random()-0.5)*2.8,
-      vy: (Math.random()-0.9)*-2.8,
-      life: 40 + Math.random()*30,
-      color: `hsl(${Math.floor(Math.random()*40)+20},90%,60%)`
-    });
-  }
-}
-function updateParticles(){
-  for (let i=particles.length-1;i>=0;i--){
-    const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.life--;
-    if (p.life <= 0) particles.splice(i,1);
-  }
-}
-function drawParticles(){
-  particles.forEach(p=>{
-    ctx.fillStyle = p.color; ctx.fillRect(Math.round(worldToScreen(p.x)), Math.round(p.y), 3, 3);
-  });
-}
-
-/* fireworks */
-function runFireworks(done){
-  let fw = [];
-  const cx = cameraX + cw/2, cy = 120;
-  for (let i=0;i<160;i++){
-    const a = Math.random()*Math.PI*2, sp=1+Math.random()*5;
-    fw.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:70+Math.random()*100,color:`hsl(${Math.random()*360},80%,60%)`});
+/* ====== Victory: fireworks & final UI ====== */
+function runFireworks(duration=2200, done){
+  const particles = [];
+  const cx = cameraX + canvasW/2, cy = 120;
+  for (let i=0;i<120;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = 1 + Math.random()*5;
+    particles.push({x:cx, y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:60+Math.random()*90, color:`hsl(${Math.floor(Math.random()*360)},80%,60%)`});
   }
   const start = performance.now();
-  function anim(t){
-    draw(); // draw underlying scene
-    fw.forEach(p=>{
-      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.life--;
-      ctx.fillStyle = p.color; ctx.fillRect(Math.round(worldToScreen(p.x)), Math.round(p.y), 4, 4);
+  function fw(t){
+    draw();
+    particles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.life--;
+      ctx.fillStyle = p.color; ctx.fillRect(Math.round(p.x-cameraX), Math.round(p.y), 4, 4);
     });
-    if (fw.some(p=>p.life>0)) requestAnimationFrame(anim);
+    if (particles.some(p=>p.life>0)) requestAnimationFrame(fw);
     else if (done) done();
   }
-  requestAnimationFrame(anim);
+  requestAnimationFrame(fw);
 }
 
-/* show small floating notifications */
-function showFloat(msg, time=1200){
-  const el = document.createElement('div'); el.textContent = msg;
-  el.style.position='fixed'; el.style.left='50%'; el.style.transform='translateX(-50%)';
-  el.style.top='16%'; el.style.background='rgba(255,255,255,0.06)'; el.style.padding='8px 12px'; el.style.borderRadius='8px';
-  el.style.pointerEvents='none'; el.style.fontFamily='Courier New'; el.style.zIndex=9999; document.body.appendChild(el);
-  setTimeout(()=>{ el.style.transition='opacity .25s'; el.style.opacity=0; setTimeout(()=>el.remove(),260); }, time);
-}
-
-/* ======= Main loop ======= */
-let running = false, lastTime = 0;
-function loop(t){
-  if (!running) return;
-  const dt = t - lastTime || 16;
-  lastTime = t;
-
-  // update spawn interval dynamically by score
-  const spawnInterval = Math.max(minSpawnInterval, baseSpawnInterval - player.score * spawnDecreasePerPoint);
-
-  // physics & updates
-  applyPhysics(dt);
-  updateEnemies(dt);
-  updateItems(dt);
-  updateParticles();
-  checkItemCollisions();
-  updateCamera();
-
-  // spawn dynamic items occasionally (adds tension)
-  if (Date.now() - lastSpawn > spawnInterval) {
-    lastSpawn = Date.now();
-    // spawn a collectible or obstacle ahead of player in reachable area
-    const aheadX = player.x + cw * (0.8 + Math.random()*0.3);
-    const choose = Math.random();
-    if (choose < 0.66) {
-      const type = Math.random() < 0.7 ? 'gift' : 'cake';
-      items.push({x: Math.min(WORLD_W-120, aheadX + Math.random()*80), y: 120 + Math.random()*200, type, vy:0, picked:false, anim:0});
-    } else {
-      const obs = Math.random()<0.6 ? 'book' : 'alarm';
-      // place obstacle but ensure gap from previous obstacles
-      items.push({x: Math.min(WORLD_W-120, aheadX + Math.random()*80 + 60), y: 120 + Math.random()*200, type:obs, vy:0, picked:false, anim:0, dangerous:true});
-    }
-  }
-
-  // render
-  ctx.clearRect(0,0,cw,ch);
-  render();
-  drawParticles();
-
-  requestAnimationFrame(loop);
-}
-
-/* ======= Controls (keyboard + mobile) ======= */
-document.addEventListener('keydown', e=>{
-  if (!running) return;
-  if (e.key === 'ArrowLeft' || e.key === 'a') player.vx = -1;
-  if (e.key === 'ArrowRight' || e.key === 'd') player.vx = 1;
-  if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'ArrowUp' || e.key === 'w') {
-    if (player.onGround) { player.vy = jumpPower; player.onGround = false; simpleTone(660,0.08,'sine',0.06); }
-  }
-});
-document.addEventListener('keyup', e=>{
-  if (!running) return;
-  if ((e.key === 'ArrowLeft' || e.key === 'a') && player.vx < 0) player.vx = 0;
-  if ((e.key === 'ArrowRight' || e.key === 'd') && player.vx > 0) player.vx = 0;
-});
-
-/* Mobile touches */
-const leftBtn = document.getElementById('leftBtn'), rightBtn = document.getElementById('rightBtn'), jumpBtn = document.getElementById('jumpBtn');
-if (leftBtn && rightBtn && jumpBtn){
-  leftBtn.addEventListener('pointerdown', ()=> player.vx = -1);
-  leftBtn.addEventListener('pointerup', ()=> { if (player.vx < 0) player.vx = 0; });
-  rightBtn.addEventListener('pointerdown', ()=> player.vx = 1);
-  rightBtn.addEventListener('pointerup', ()=> { if (player.vx > 0) player.vx = 0; });
-  jumpBtn.addEventListener('pointerdown', ()=>{ if (player.onGround) { player.vy = jumpPower; player.onGround=false; simpleTone(660,0.08,'sine',0.06); }});
-}
-
-/* ======= Start / Reset / Victory ======= */
-function startQuest(){
-  dialogEl.classList.add('hidden');
-  hud.classList.remove('hidden');
-  canvas.classList.remove('hidden');
-  document.getElementById('final').classList.add('hidden');
-
-  buildPlatforms();
-  createInitialItems();
-  player.x = 80; player.y = 360; player.vx = 0; player.vy = 0; player.score = 0;
-  cameraX = 0;
-  scoreText.textContent = `Score: ${player.score} / ${TARGET_SCORE}`;
-  running = true; lastTime = performance.now();
-  if (musicOn) startMusic();
-  requestAnimationFrame(loop);
-}
-
-/* victory */
 function triggerVictory(){
+  if (!running) return;
   running = false;
   stopMusic();
-  sfxVictory();
-  runFireworks(()=> {
-    document.getElementById('finalText').innerHTML = `🎉 <strong>HAPPY 17th BIRTHDAY, ${NAME.toUpperCase()}</strong> 🎂<br><small>Wishing you joy, success, and endless cake 🍰</small>`;
+  playSfxVictory();
+  runFireworks(2200, ()=> {
+    document.getElementById('finalText').innerHTML = `🎉 <strong>HAPPY 17th BIRTHDAY, ${NAME.toUpperCase()}</strong> 🎂<br><small>Wishing you joy and endless cake 🍰</small>`;
     document.getElementById('final').classList.remove('hidden');
     hud.classList.add('hidden');
   });
 }
 
-/* replay */
-document.getElementById('replayBtn').addEventListener('click', ()=>{
-  startQuest();
-});
-
-/* certificate generation */
+/* ====== Certificate generation (offscreen canvas) ====== */
 document.getElementById('downloadCert').addEventListener('click', generateCertificate);
 function generateCertificate(){
   const W = 1400, H = 900;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
   g.fillStyle = "#fff9f2"; g.fillRect(0,0,W,H);
-  g.strokeStyle = "#072733"; g.lineWidth = 12; g.strokeRect(40,40,W-80,H-80);
-  g.fillStyle = "#072733"; g.font = "56px Courier New"; g.textAlign = "center";
-  g.fillText("Certificate of Legendary Birthday", W/2, 110);
-  g.font = "36px Courier New"; g.fillText(NAME, W/2, 180);
-  g.font = "24px Courier New"; g.textAlign = "left";
+  g.strokeStyle = "#0b2f47"; g.lineWidth = 12; g.strokeRect(40,40,W-80,H-80);
+  g.fillStyle = "#0b2f47"; g.font = "56px Courier New"; g.textAlign = "center";
+  g.fillText("Certificate of Legendary Birthday", W/2, 120);
+  g.font = "42px Courier New"; g.fillText(NAME, W/2, 190);
+  g.font = "26px Courier New"; g.textAlign = "left";
   const lines = [
     `On your 17th birthday, you completed the ultimate birthday quest.`,
-    `May this year be filled with joy, success, and endless cake!`,
+    `May this year be filled with joy, success and endless cake!`,
     ``,
     `Award: Completed Abdullah's 17th Birthday Quest`,
     `Date: ${new Date().toLocaleDateString()}`,
     ``,
     `With love, your friend.`
   ];
-  for (let i=0;i<lines.length;i++) g.fillText(lines[i], 120, 260 + i*36);
-  // pixel portrait (head portion)
+  for (let i=0;i<lines.length;i++) g.fillText(lines[i], 140, 280 + i*42);
+
+  // pixel portrait (head)
   const head = heroSprite.slice(0,7);
   const pal = heroPalette();
-  const pScale = 12;
+  const pScale = 10;
   for (let yy=0; yy<head.length; yy++){
     for (let xx=0; xx<head[0].length; xx++){
-      const v = head[yy][xx];
-      if (!v) continue;
+      const v = head[yy][xx]; if (!v) continue;
       g.fillStyle = pal[v]; g.fillRect(980 + xx*pScale, 260 + yy*pScale, pScale, pScale);
     }
   }
-  // cake small
+
+  // cake pixel art
   for (let yy=0; yy<cakeSprite.length; yy++){
     for (let xx=0; xx<cakeSprite[0].length; xx++){
       const v = cakeSprite[yy][xx]; if (!v) continue;
-      g.fillStyle = cakePal[v]; g.fillRect(980 + xx*10, 420 + yy*10, 10, 10);
+      g.fillStyle = cakePalette[v]; g.fillRect(980 + xx*10, 480 + yy*10, 10, 10);
     }
   }
 
-  g.textAlign = "center"; g.font = "18px Courier New"; g.fillStyle="#444";
+  g.font = "18px Courier New"; g.fillStyle="#444"; g.textAlign="center";
   g.fillText("Generated with ❤️ on GitHub Pages", W/2, H-60);
 
   const url = c.toDataURL('image/png');
   const a = document.createElement('a'); a.href = url; a.download = `Certificate_${NAME.replace(/\s+/g,'_')}_17.png`; document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* ======= Dialogue system UI ======= */
-const dialogEl = document.getElementById('dialogue');
-const contButton = document.getElementById('contBtn');
-let scriptIndex = 0, typing=false, charI=0, typeTimer=null;
+/* ====== HUD utilities & floating texts ====== */
+function updateScore(){ scoreEl.textContent = `Score: ${player.score} / ${TARGET_SCORE}`; }
+function showFloatingText(text, worldX){
+  const el = document.createElement('div');
+  el.textContent = text;
+  el.style.position='fixed'; el.style.left=(Math.max(40, Math.min(window.innerWidth-120, (worldToScreen(worldX) + 60))))+'px';
+  el.style.top='18%'; el.style.background='rgba(255,255,255,0.06)'; el.style.padding='6px 10px'; el.style.borderRadius='8px';
+  el.style.pointerEvents='none'; el.style.fontFamily='Courier New';
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .3s'; el.style.opacity=0; setTimeout(()=>el.remove(),300); }, 900);
+}
 
-function showNextScript(){
-  choicesEl.innerHTML = ""; contButton.classList.add('hidden');
+/* ====== Input handling ====== */
+const PLAYER_SPEED = 3.6;
+const JUMP_SPEED = -11;
+const GRAVITY = 0.6;
+let ASSIST_ON = false;
+let MUSIC_ON = true;
+
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'ArrowLeft' || e.key === 'a') player.vx = -1;
+  if (e.key === 'ArrowRight' || e.key === 'd') player.vx = 1;
+  if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'ArrowUp' || e.key === 'w') {
+    if (player.onGround){ player.vy = JUMP_SPEED; player.onGround = false; simpleTone(760,0.08,'sine',0.06);}
+  }
+  // debug assist toggle
+  if (e.key === 'H' || e.key === 'h') { toggleAssist(); }
+});
+document.addEventListener('keyup', (e)=>{
+  if ((e.key === 'ArrowLeft' || e.key === 'a') && player.vx < 0) player.vx = 0;
+  if ((e.key === 'ArrowRight' || e.key === 'd') && player.vx > 0) player.vx = 0;
+});
+
+/* Mobile control buttons */
+document.getElementById('leftBtn')?.addEventListener('pointerdown', ()=>player.vx = -1);
+document.getElementById('leftBtn')?.addEventListener('pointerup', ()=>player.vx = 0);
+document.getElementById('rightBtn')?.addEventListener('pointerdown', ()=>player.vx = 1);
+document.getElementById('rightBtn')?.addEventListener('pointerup', ()=>player.vx = 0);
+document.getElementById('jumpBtn')?.addEventListener('pointerdown', ()=>{ if (player.onGround){ player.vy = JUMP_SPEED; player.onGround=false; simpleTone(760,0.08,'sine',0.06); } });
+
+/* mute & assist buttons */
+document.getElementById('muteBtn').addEventListener('click', ()=>{
+  MUSIC_ON = !MUSIC_ON;
+  document.getElementById('muteBtn').textContent = MUSIC_ON ? '🔊 Music: On' : '🔈 Music: Off';
+  if (MUSIC_ON) startMusic(); else stopMusic();
+});
+document.getElementById('assistBtn').addEventListener('click', toggleAssist);
+function toggleAssist(){
+  ASSIST_ON = !ASSIST_ON;
+  document.getElementById('assistBtn').textContent = ASSIST_ON ? '❤️ Assist: On' : '❤️ Assist: Off';
+  showFloatingText(ASSIST_ON ? "Assist: ON (collectibles drift to you)" : "Assist: OFF", player.x);
+}
+
+/* dialogue rendering & flow */
+let scriptIndex = 0, typingTimer = null, charI = 0, isTyping=false;
+function showScriptNext(){
+  dialogueChoices.innerHTML = ""; dialogueContinue.classList.add('hidden');
   if (scriptIndex >= script.length) return;
   const node = script[scriptIndex++];
-
   if (node.type === 'text'){
-    typeText(node.text, ()=>{ contButton.classList.remove('hidden'); contButton.onclick = ()=>{ contButton.classList.add('hidden'); showNextScript(); }; });
+    typeText(node.text, ()=>{ dialogueContinue.classList.remove('hidden'); dialogueContinue.onclick = ()=>{ dialogueContinue.classList.add('hidden'); showScriptNext(); }; });
   } else if (node.type === 'choice'){
-    typeText(node.text, ()=> {
+    typeText(node.text, ()=>{
       node.choices.forEach(c=>{
         const b = document.createElement('button'); b.className='btn'; b.textContent = c.label;
-        b.onclick = ()=>{ showFloat(c.reply); typeText(c.reply, ()=> setTimeout(()=> showNextScript(), 600), true); };
-        choicesEl.appendChild(b);
+        b.onclick = ()=>{ showFloatingText(c.reply, player.x + 40); typeText(c.reply, ()=> setTimeout(()=> showScriptNext(), 600), true); };
+        dialogueChoices.appendChild(b);
       });
     });
   } else if (node.type === 'action'){
     const b = document.createElement('button'); b.className='btn'; b.textContent = node.label;
-    b.onclick = ()=> { startQuest(); };
-    choicesEl.appendChild(b);
+    b.onclick = ()=>{ startQuest(); };
+    dialogueChoices.appendChild(b);
   }
 }
 function typeText(txt, done, override=false){
-  if (typing && !override) return;
-  typing = true; dialogText.textContent = ""; charI = 0;
-  clearInterval(typeTimer);
-  typeTimer = setInterval(()=>{ dialogText.textContent += txt[charI++] || ''; if (charI >= txt.length){ clearInterval(typeTimer); typing=false; if (done) done(); } }, 16);
+  if (isTyping && !override) return;
+  isTyping = true; dialogueText.textContent=''; charI=0; clearInterval(typingTimer);
+  const speed = 16;
+  typingTimer = setInterval(()=>{ dialogueText.textContent += txt[charI++] || ''; if (charI >= txt.length){ clearInterval(typingTimer); isTyping=false; if (done) done(); } }, speed);
 }
-showNextScript();
+showScriptNext();
 
-/* ======= Start music on first gesture (unblock autoplay) ======= */
-document.addEventListener('pointerdown', ()=>{ if (!audioCtx && musicOn) startMusic(); }, { once:true });
+/* ====== Start quest ====== */
+let running = false;
+function startQuest(){
+  dialogue.classList.add('hidden');
+  hud.classList.remove('hidden');
+  canvas.classList.remove('hidden');
+  document.getElementById('final').classList.add('hidden');
+  // prepare world & reset player
+  makeWorld();
+  player.x = 80; player.y = 260; player.vx = 0; player.vy = 0; player.score = 0;
+  updateScore();
+  cameraX = 0;
+  running = true;
+  lastTime = 0;
+  if (MUSIC_ON) startMusic();
+  requestAnimationFrame(loop);
+}
 
-/* Mute toggle */
-const muteBtn = document.getElementById('muteBtn');
-muteBtn.addEventListener('click', ()=>{ musicOn = !musicOn; muteBtn.textContent = musicOn ? '🔊 Music: On' : '🔈 Music: Off'; if (musicOn) startMusic(); else stopMusic(); });
+/* update score HUD */
+function updateScore(){ scoreEl.textContent = `Score: ${player.score} / ${TARGET_SCORE}`; }
 
-/* resize handling (responsive canvas scaling) */
+/* ====== loop & start/pause helpers ====== */
+document.getElementById('playAgain').addEventListener('click', ()=>{ startQuest(); });
+/* ensure audio start on first user interaction (browsers block autoplay) */
+document.addEventListener('pointerdown', ()=>{ if (!audioCtx && MUSIC_ON) startMusic(); }, { once:true });
+
+/* initial HUD update */
+updateScore();
+
+/* ====== show mobile controls when small screen ====== */
 function resizeCanvas(){
-  const maxW = Math.min(window.innerWidth * 0.94, 980);
-  canvas.width = Math.floor(Math.min(maxW, 980));
-  canvas.height = Math.floor(canvas.width * 0.6);
-  cw = canvas.width; ch = canvas.height;
+  canvasW = canvas.width = Math.min(920, Math.floor(window.innerWidth * 0.94));
+  canvasH = canvas.height = Math.floor(canvasW * 0.63);
+  // ensure draw dimensions updated
 }
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', ()=>{ resizeCanvas(); draw(); });
 resizeCanvas();
 
-/* ======= Kickoff: set HUD & create world ======= */
-document.getElementById('playerName').textContent = NAME;
-buildPlatforms();
-createInitialItems();
-scoreText.textContent = `Score: ${player.score} / ${TARGET_SCORE}`;
+/* ====== small helper messages ====== */
+function showFloatingText(text, worldX){
+  const el = document.createElement('div');
+  el.textContent = text; el.style.position='fixed';
+  const sx = Math.max(40, Math.min(window.innerWidth - 160, worldToScreen(worldX) + 60));
+  el.style.left = sx + 'px'; el.style.top = (window.innerHeight * 0.18) + 'px';
+  el.style.background = 'rgba(255,255,255,0.06)'; el.style.padding='8px 12px'; el.style.borderRadius='8px';
+  el.style.pointerEvents = 'none'; el.style.fontFamily='Courier New'; document.body.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s'; el.style.opacity = 0; setTimeout(()=>el.remove(), 300); }, 1000);
+}
 
-/* make sure HUD shows correct score when
+/* expose assist toggle to console for quick testing */
+window._assist = ()=>{ toggleAssist(); };
+
+/* ====== make sure nothing is silently failing: minimal error handler ====== */
+window.addEventListener('error', (e) => {
+  console.error('GAME ERROR', e.error || e.message);
+  alert('There was an error in the game console. Open DevTools and check console for details.');
+});
+
+</script>
+</body>
+</html>
