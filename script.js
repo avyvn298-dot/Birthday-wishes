@@ -16,49 +16,21 @@ const loseSound = document.getElementById("loseSound");
 const tileSize = 30;
 
 // Game state
-let player, movesHistory, clones, frameCount, cloneInterval, running, startTime, level;
+let player, movesHistory, clones, frameCount, cloneInterval, running, startTime, bestTime;
 
-// Mazes (1 = wall, 0 = empty, 2 = goal)
-const mazes = [
-  [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,2,1],
-    [1,0,1,1,1,0,0,1,0,1,0,1,0,1,1,1,1,0,0,1],
-    [1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,1],
-    [1,1,1,0,1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1],
-    [1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1],
-    [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-    [1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-  ],
-  [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,2,1],
-    [1,0,1,1,0,1,1,1,0,1,0,1,1,0,1,0,1,1,0,1],
-    [1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,1],
-    [1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,0,1,1,1,1],
-    [1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,1],
-    [1,0,1,0,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1],
-    [1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-  ],
-  [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,2,1],
-    [1,0,1,1,0,1,0,1,1,1,0,1,0,1,0,1,1,0,0,1],
-    [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,1,0,0,1],
-    [1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1],
-    [1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,0,1,1,0,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
-    [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-  ]
+// Maze layout (1 = wall, 0 = empty, 2 = safe zone)
+let maze = [
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
+  [1,0,1,1,1,0,0,1,0,1,0,1,0,1,1,1,1,0,0,1],
+  [1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,0,0,1],
+  [1,1,1,0,1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1],
+  [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,1],
+  [1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1],
+  [1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
+  [1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1],
+  [1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
 // Reset game
@@ -67,11 +39,10 @@ function resetGame() {
   movesHistory = [];
   clones = [];
   frameCount = 0;
-  cloneInterval = 300 - (level * 40); // faster each level
-  if (cloneInterval < 120) cloneInterval = 120;
+  cloneInterval = 300; // initial clone spawn speed
   running = true;
-  if (level === 1) startTime = Date.now();
-  statusText.textContent = `Level ${level} - Reach the gold square!`;
+  startTime = Date.now();
+  statusText.textContent = "Survive as long as possible!";
   restartBtn.style.display = "none";
   timerText.textContent = "Time: 0s";
 }
@@ -88,7 +59,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft" || e.key === "a") newX--;
   if (e.key === "ArrowRight" || e.key === "d") newX++;
 
-  if (mazes[level-1][newY][newX] !== 1) {
+  if (maze[newY][newX] !== 1) {
     player.x = newX;
     player.y = newY;
     movesHistory.push({ x: newX, y: newY });
@@ -127,17 +98,11 @@ function gameLoop() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let maze = mazes[level-1];
-
   // Draw maze
   for (let y = 0; y < maze.length; y++) {
     for (let x = 0; x < maze[y].length; x++) {
       if (maze[y][x] === 1) {
         ctx.fillStyle = "gray";
-        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
-      }
-      if (maze[y][x] === 2) {
-        ctx.fillStyle = "gold";
         ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
       }
     }
@@ -146,7 +111,7 @@ function gameLoop() {
   // Spawn new clones (faster over time)
   if (frameCount % cloneInterval === 0 && movesHistory.length > 0) {
     clones.push(new Clone(movesHistory));
-    if (cloneInterval > 100) cloneInterval -= 10;
+    if (cloneInterval > 100) cloneInterval -= 10; // difficulty increases
   }
 
   // Update & draw clones
@@ -154,7 +119,7 @@ function gameLoop() {
     clone.update();
     clone.draw();
     if (clone.x === player.x && clone.y === player.y) {
-      gameOver(false);
+      gameOver();
       return;
     }
   }
@@ -163,12 +128,6 @@ function gameLoop() {
   ctx.fillStyle = player.color;
   ctx.fillRect(player.x * tileSize, player.y * tileSize, tileSize, tileSize);
 
-  // Check win
-  if (maze[player.y][player.x] === 2) {
-    nextLevel();
-    return;
-  }
-
   // Timer
   let elapsed = Math.floor((Date.now() - startTime) / 1000);
   timerText.textContent = "Time: " + elapsed + "s";
@@ -176,42 +135,26 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// Next level
-function nextLevel() {
-  running = false;
-  bgMusic.pause();
-  winSound.play();
-
-  if (level < mazes.length) {
-    statusText.textContent = `🎉 Level ${level} cleared!`;
-    setTimeout(() => {
-      level++;
-      resetGame();
-      requestAnimationFrame(gameLoop);
-      bgMusic.currentTime = 0;
-      bgMusic.play();
-    }, 2000);
-  } else {
-    let totalTime = Math.floor((Date.now() - startTime) / 1000);
-    statusText.textContent = `🏆 You escaped all levels in ${totalTime}s!`;
-    restartBtn.style.display = "inline-block";
-  }
-}
-
 // Game over
-function gameOver(win) {
+function gameOver() {
   running = false;
   bgMusic.pause();
-  if (!win) {
-    statusText.textContent = "☠️ You were caught by your shadow clone!";
-    loseSound.play();
-    restartBtn.style.display = "inline-block";
+  loseSound.play();
+
+  let elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+  if (!bestTime || elapsed > bestTime) {
+    bestTime = elapsed;
+    statusText.textContent = `☠️ You survived ${elapsed}s (NEW RECORD!)`;
+  } else {
+    statusText.textContent = `☠️ You survived ${elapsed}s (Best: ${bestTime}s)`;
   }
+
+  restartBtn.style.display = "inline-block";
 }
 
 // Restart button
 restartBtn.addEventListener("click", () => {
-  level = 1;
   resetGame();
   requestAnimationFrame(gameLoop);
   bgMusic.currentTime = 0;
@@ -223,7 +166,6 @@ startBtn.addEventListener("click", () => {
   menu.style.display = "none";
   canvas.style.display = "block";
   ui.style.display = "block";
-  level = 1;
   resetGame();
   requestAnimationFrame(gameLoop);
   bgMusic.currentTime = 0;
