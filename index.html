@@ -2,52 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shadow Clone Escape — Complete</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Shadow Clone Escape — Complete Mobile & Desktop</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Shadow Clone Escape</h1>
-
-  <div id="menu">
-    <p class="big">Survive as long as possible in a new solvable maze each run.</p>
-    <div class="menu-row">
-      <button id="startBtn">Start Run</button>
-      <button id="tutorialBtn">Tutorial</button>
-      <button id="settingsBtn">Settings</button>
+  <header class="topbar">
+    <h1>Shadow Clone Escape</h1>
+    <div class="top-controls">
+      <button id="menuBtnHeader" class="small">Menu</button>
     </div>
+  </header>
 
-    <div id="tutorial" class="panel" style="display:none;">
-      <p>- Move with <b>WASD</b> or <b>Arrow Keys</b>. Smooth movement is enabled.</p>
-      <p>- Avoid clones (they replay your past path). Touching one = Game Over.</p>
-      <p>- Collect power-ups: <i>Speed</i>, <i>Cloak</i>, <i>Freeze</i>.</p>
-    </div>
+  <main class="layout">
+    <!-- Left column: Menu / Info -->
+    <aside id="leftPanel" class="panel">
+      <div id="menu" class="panel-block">
+        <p class="big">Survive as long as possible — new solvable maze every run.</p>
+        <div class="menu-row">
+          <button id="startBtn">Start Run</button>
+          <button id="tutorialBtn">Tutorial</button>
+          <button id="settingsBtn">Settings</button>
+        </div>
+        <p id="bestRecordText">Best: —</p>
+      </div>
 
-    <div id="settings" class="panel" style="display:none;">
-      <label><input type="checkbox" id="musicToggle" checked> Music</label><br>
-      <label><input type="checkbox" id="sfxToggle" checked> SFX</label><br>
-      <label>Difficulty: <input id="difficulty" type="range" min="0" max="2" step="1" value="1"></label>
-      <p style="font-size:13px;color:#ccc">Easy ←  Normal  → Hard</p>
-    </div>
+      <div id="tutorial" class="panel-block panel-hidden">
+        <h3>Tutorial</h3>
+        <ul>
+          <li>Move with WASD / arrow keys or on-screen controls.</li>
+          <li>Avoid clones — they replay your past path.</li>
+          <li>Collect power-ups (Speed/Cloak/Freeze) to survive longer.</li>
+          <li>Try to set a top time — local leaderboard saves your name + time.</li>
+        </ul>
+      </div>
 
-    <p id="bestRecordText">Best: —</p>
-  </div>
+      <div id="settings" class="panel-block panel-hidden">
+        <h3>Settings</h3>
+        <label><input type="checkbox" id="musicToggle" checked> Music</label><br>
+        <label><input type="checkbox" id="sfxToggle" checked> SFX</label><br>
+        <label>Difficulty:
+          <input id="difficulty" type="range" min="0" max="2" step="1" value="1">
+        </label>
+        <p class="muted small">Easy ← Normal → Hard</p>
+        <hr>
+        <h3>Leaderboard</h3>
+        <ol id="leaderboardList"></ol>
+        <button id="clearLeaderboard" class="small warn">Clear Leaderboard</button>
+      </div>
+    </aside>
 
-  <canvas id="gameCanvas" width="720" height="600" style="display:none;"></canvas>
+    <!-- Center: Canvas -->
+    <section id="gameSection" class="panel center-panel">
+      <div id="canvasWrap">
+        <canvas id="gameCanvas"></canvas>
+        <canvas id="miniMap" class="minimap"></canvas>
+      </div>
 
-  <div id="ui" style="display:none;">
-    <div class="hud">
-      <div id="status">Survive as long as you can</div>
-      <div id="timer">Time: 0s</div>
-      <div id="powerupBox"></div>
-    </div>
-    <div class="menu-row">
-      <button id="restartBtn" style="display:none;">Restart</button>
-      <button id="menuBtn" style="display:none;">Back to Menu</button>
-    </div>
-  </div>
+      <div id="ui" class="hud panel-hidden">
+        <div class="hud-top">
+          <div id="status">Survive as long as you can</div>
+          <div id="timer">Time: 0s</div>
+          <div id="powerupBox"></div>
+        </div>
 
-  <!-- Audio -->
+        <div class="hud-bottom">
+          <button id="restartBtn" class="small" style="display:none;">Restart</button>
+          <button id="menuBtn" class="small" style="display:none;">Back to Menu</button>
+        </div>
+      </div>
+
+      <!-- Mobile controls -->
+      <div id="mobileControls" class="mobile-controls hidden">
+        <div id="dpad" class="dpad">
+          <button data-dir="up" class="dpad-btn up">▲</button>
+          <div class="dpad-row">
+            <button data-dir="left" class="dpad-btn left">◀</button>
+            <button data-dir="down" class="dpad-btn down">▼</button>
+            <button data-dir="right" class="dpad-btn right">▶</button>
+          </div>
+        </div>
+        <div class="mobile-actions">
+          <button id="btnPower" class="small">Power</button>
+          <button id="btnPause" class="small">⏸</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right column: Info / Leaderboard -->
+    <aside id="rightPanel" class="panel">
+      <div class="panel-block">
+        <h3>Controls</h3>
+        <p>Keyboard: WASD / Arrow keys. Mobile: on-screen D-Pad + Power button.</p>
+      </div>
+      <div class="panel-block">
+        <h3>Power-ups</h3>
+        <ul>
+          <li><b>Speed</b> — movement boost for a short time.</li>
+          <li><b>Cloak</b> — clones ignore you briefly.</li>
+          <li><b>Freeze</b> — pauses clones for a few seconds.</li>
+        </ul>
+      </div>
+      <div class="panel-block">
+        <h3>Tips</h3>
+        <ul>
+          <li>Plan your path — clones replay your exact steps.</li>
+          <li>Use corridors to funnel clones past you.</li>
+          <li>Save power-ups for tight situations.</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <small>Built for GitHub Pages — open-source. Replace audio links with your own files if you like.</small>
+  </footer>
+
+  <!-- Audio (replace with repo-hosted files if preferred) -->
   <audio id="bgMusic" loop>
     <source src="https://cdn.pixabay.com/audio/2022/11/02/audio_dfe97b58c8.mp3" type="audio/mpeg">
   </audio>
